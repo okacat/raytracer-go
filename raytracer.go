@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"math"
 	"os"
 )
 
@@ -52,9 +53,10 @@ func main() {
 }
 
 func rayColor(r Ray) color.Color {
+	normal, hit := hitSphere(r, Vector3{0, 0, -1}, 0.5)
 	switch {
-	case hitSphere(r, Vector3{0, 0, -1}, 0.5):
-		return color.RGBA{255, 0, 0, 0xff}
+	case hit:
+		return normal.AddScalar(1.0).Scale(0.5).ToColor()
 	default:
 		return skyboxColor(r)
 	}
@@ -68,11 +70,16 @@ func skyboxColor(r Ray) color.Color {
 	return a.Add(b).ToColor()
 }
 
-func hitSphere(ray Ray, center Vector3, radius float64) bool {
+func hitSphere(ray Ray, center Vector3, radius float64) (Vector3, bool) {
 	oc := ray.Origin.Subtract(center)
 	a := ray.Direction.Dot(ray.Direction)
 	b := oc.Dot(ray.Direction) * 2.0
 	c := oc.Dot(oc) - radius*radius
 	discriminant := b*b - 4*a*c
-	return discriminant > 0
+	if discriminant < 0 {
+		return Vector3{0, 0, 0}, false
+	}
+	t := (-b - math.Sqrt(discriminant)) / (2.0 * a)
+	normal := ray.At(t).Subtract(Vector3{0, 0, -1}).Unit()
+	return normal, true
 }

@@ -19,6 +19,15 @@ func (a Vector3) Add(b Vector3) Vector3 {
 	}
 }
 
+// AddScalar adds the scalar to this vector and returns the result as a new vector
+func (a Vector3) AddScalar(s float64) Vector3 {
+	return Vector3{
+		X: a.X + s,
+		Y: a.Y + s,
+		Z: a.Z + s,
+	}
+}
+
 // Subtract subtracts this vector with the other vector and returns the result as a new vector
 func (a Vector3) Subtract(b Vector3) Vector3 {
 	return Vector3{
