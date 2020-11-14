@@ -52,7 +52,12 @@ func main() {
 }
 
 func rayColor(r Ray) color.Color {
-	return skyboxColor(r)
+	switch {
+	case hitSphere(r, Vector3{0, 0, -1}, 0.5):
+		return color.RGBA{255, 0, 0, 0xff}
+	default:
+		return skyboxColor(r)
+	}
 }
 
 func skyboxColor(r Ray) color.Color {
@@ -61,4 +66,13 @@ func skyboxColor(r Ray) color.Color {
 	a := Vector3{0.5, 0.7, 1.0}.Scale(t)
 	b := Vector3{1.0, 1.0, 1.0}.Scale(1.0 - t)
 	return a.Add(b).ToColor()
+}
+
+func hitSphere(ray Ray, center Vector3, radius float64) bool {
+	oc := ray.Origin.Subtract(center)
+	a := ray.Direction.Dot(ray.Direction)
+	b := oc.Dot(ray.Direction) * 2.0
+	c := oc.Dot(oc) - radius*radius
+	discriminant := b*b - 4*a*c
+	return discriminant > 0
 }
