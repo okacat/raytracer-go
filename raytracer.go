@@ -72,14 +72,14 @@ func skyboxColor(r Ray) color.Color {
 
 func hitSphere(ray Ray, center Vector3, radius float64) (Vector3, bool) {
 	oc := ray.Origin.Subtract(center)
-	a := ray.Direction.Dot(ray.Direction)
-	b := oc.Dot(ray.Direction) * 2.0
-	c := oc.Dot(oc) - radius*radius
-	discriminant := b*b - 4*a*c
+	a := ray.Direction.LengthSquared()
+	bHalf := oc.Dot(ray.Direction)
+	c := oc.LengthSquared() - radius*radius
+	discriminant := bHalf*bHalf - a*c
 	if discriminant < 0 {
 		return Vector3{0, 0, 0}, false
 	}
-	t := (-b - math.Sqrt(discriminant)) / (2.0 * a)
+	t := (-bHalf - math.Sqrt(discriminant)) / a
 	normal := ray.At(t).Subtract(Vector3{0, 0, -1}).Unit()
 	return normal, true
 }

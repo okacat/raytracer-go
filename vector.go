@@ -48,7 +48,12 @@ func (a Vector3) Scale(s float64) Vector3 {
 
 // Length returns the length of this Vector3
 func (a Vector3) Length() float64 {
-	return math.Sqrt(a.X*a.X + a.Y*a.Y + a.Z*a.Z)
+	return math.Sqrt(a.LengthSquared())
+}
+
+// LengthSquared returns the squared length of this Vector3
+func (a Vector3) LengthSquared() float64 {
+	return a.X*a.X + a.Y*a.Y + a.Z*a.Z
 }
 
 // Unit returns a new unit vector
