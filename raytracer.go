@@ -52,10 +52,10 @@ func main() {
 }
 
 func rayColor(r Ray) color.Color {
-	normal, hit := Sphere{Vector3{0, 0, -1}, 0.5}.Hit(r)
+	hitRecord, hit := Sphere{Vector3{0, 0, -1}, 0.5}.Hit(r)
 	switch {
 	case hit:
-		return normal.AddScalar(1.0).Scale(0.5).ToColor()
+		return hitRecord.Normal.AddScalar(1.0).Scale(0.5).ToColor()
 	default:
 		return skyboxColor(r)
 	}
