@@ -12,7 +12,8 @@ import (
 
 const width = 1000
 const height = 600
-const samplesPerPixel = 50
+const samplesPerPixel = 10
+const maxBounces = 50
 
 func main() {
 	upLeft := image.Point{0, 0}
@@ -34,7 +35,7 @@ func main() {
 				u := (float64(x) + rand.Float64()) / float64(width-1)
 				v := (float64(y) + rand.Float64()) / float64(height-1)
 				ray := camera.GetRay(u, v)
-				accumulatedColor = accumulatedColor.Add(rayColor(ray, world))
+				accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0))
 			}
 			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).ToColor()
 			img.Set(x, height-y, pixelColor) // TODO why is y inverted?
@@ -50,10 +51,18 @@ func main() {
 	png.Encode(f, img)
 }
 
-func rayColor(r Ray, w World) Vector3 {
+func rayColor(r Ray, w World, depth float64) Vector3 {
+	if depth > 50 {
+		return Vector3{0, 0, 0}
+	}
 	hitRecord, hit := w.Hit(r, 0, math.Inf(1))
 	if hit {
-		return hitRecord.Normal.AddScalar(1.0).Scale(0.5)
+		target := hitRecord.Point.Add(hitRecord.Normal).Add(RandomInUnitSphere())
+		bounceRay := Ray{
+			Origin:    hitRecord.Point,
+			Direction: target.Subtract(hitRecord.Point),
+		}
+		return rayColor(bounceRay, w, depth+1)
 	}
 	return skyboxColor(r)
 }

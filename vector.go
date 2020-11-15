@@ -3,6 +3,7 @@ package main
 import (
 	"image/color"
 	"math"
+	"math/rand"
 )
 
 // Vector3 is a 3d vector
@@ -83,5 +84,19 @@ func (a Vector3) ToColor() color.Color {
 		G: uint8(a.Y * 255),
 		B: uint8(a.Z * 255),
 		A: 255,
+	}
+}
+
+// RandomInUnitSphere returns a random vector inside a unit sphere
+func RandomInUnitSphere() Vector3 {
+	for {
+		vector := Vector3{
+			X: rand.Float64()*2.0 - 1.0,
+			Y: rand.Float64()*2.0 - 1.0,
+			Z: rand.Float64()*2.0 - 1.0,
+		}
+		if vector.LengthSquared() < 1 {
+			return vector
+		}
 	}
 }
