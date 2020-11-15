@@ -28,6 +28,7 @@ func main() {
 
 	startTime := time.Now()
 
+	progress := 0
 	for y := height - 1; y >= 0; y-- {
 		for x := 0; x < width; x++ {
 			accumulatedColor := Vector3{0, 0, 0}
@@ -38,7 +39,12 @@ func main() {
 				accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0))
 			}
 			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).ToColor()
-			img.Set(x, height-y, pixelColor) // TODO why is y inverted?
+			img.Set(x, height-y, pixelColor)
+			newProgress := int(math.Floor(float64(((height-y)*width)+x) / float64(width*height) * 100))
+			if newProgress != progress {
+				progress = newProgress
+				fmt.Printf("progress [%v%%]\n", progress)
+			}
 		}
 	}
 
