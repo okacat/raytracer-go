@@ -9,8 +9,25 @@ type Hittable interface {
 
 // HitRecord holds information of a Ray hitting a Hittable object
 type HitRecord struct {
-	T             float64
 	Point, Normal Vector3
+	T             float64
+	IsFrontFace   bool
+}
+
+// MakeHitRecord initializes a new HitRecord and returns it
+func MakeHitRecord(point, normal Vector3, ray Ray, t float64) HitRecord {
+	rayDotNormal := ray.Direction.Dot(normal)
+	isFrontFace := rayDotNormal < 0
+	outwardNormal := normal
+	if !isFrontFace {
+		outwardNormal = normal.Scale(-1)
+	}
+	return HitRecord{
+		Point:       point,
+		Normal:      outwardNormal,
+		T:           t,
+		IsFrontFace: isFrontFace,
+	}
 }
 
 // Sphere is a Hittable object
@@ -32,9 +49,6 @@ func (s Sphere) Hit(r Ray) (*HitRecord, bool) {
 	t := (-bHalf - math.Sqrt(discriminant)) / a
 	hitPoint := r.At(t)
 	normal := hitPoint.Subtract(Vector3{0, 0, -1}).Unit()
-	return &HitRecord{
-		T:      t,
-		Point:  hitPoint,
-		Normal: normal,
-	}, true
+	hitRecord := MakeHitRecord(hitPoint, normal, r, t)
+	return &hitRecord, true
 }
