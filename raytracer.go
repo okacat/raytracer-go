@@ -31,12 +31,17 @@ func main() {
 	progress := 0
 	for y := height - 1; y >= 0; y-- {
 		for x := 0; x < width; x++ {
-			accumulatedColor := Vector3{0, 0, 0}
-			for sample := 0; sample < samplesPerPixel; sample++ {
+			ch := make(chan Vector3, samplesPerPixel)
+			for sample := 0; sample < cap(ch); sample++ {
 				u := (float64(x) + rand.Float64()) / float64(width-1)
 				v := (float64(y) + rand.Float64()) / float64(height-1)
 				ray := camera.GetRay(u, v)
-				accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0))
+				go rayColorPar(ray, world, ch)
+			}
+			accumulatedColor := Vector3{0, 0, 0}
+			for n := 0; n < cap(ch); n++ {
+				sampleColor := <-ch
+				accumulatedColor = accumulatedColor.Add(sampleColor)
 			}
 			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).gammaCorrect().ToColor()
 			img.Set(x, height-y, pixelColor)
@@ -55,6 +60,10 @@ func main() {
 		fmt.Println(error)
 	}
 	png.Encode(f, img)
+}
+
+func rayColorPar(r Ray, w World, c chan Vector3) {
+	c <- rayColor(r, w, 0)
 }
 
 func rayColor(r Ray, w World, depth float64) Vector3 {
