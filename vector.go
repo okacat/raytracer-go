@@ -57,7 +57,7 @@ func (a Vector3) LengthSquared() float64 {
 	return a.X*a.X + a.Y*a.Y + a.Z*a.Z
 }
 
-// Unit returns a new unit vector
+// Unit returns a new normalized vector
 func (a Vector3) Unit() Vector3 {
 	return a.Scale(1.0 / a.Length())
 }
@@ -99,4 +99,9 @@ func RandomInUnitSphere() Vector3 {
 			return vector
 		}
 	}
+}
+
+// RandomOnUnitSphere returns a random vector on the surface of a unit sphere
+func RandomOnUnitSphere() Vector3 {
+	return RandomInUnitSphere().Unit()
 }

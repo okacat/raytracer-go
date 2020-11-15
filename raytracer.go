@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-const width = 1000
-const height = 600
-const samplesPerPixel = 10
+const width = 500
+const height = 250
+const samplesPerPixel = 50
 const maxBounces = 50
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
 				ray := camera.GetRay(u, v)
 				accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0))
 			}
-			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).ToColor()
+			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).gammaCorrect().ToColor()
 			img.Set(x, height-y, pixelColor)
 			newProgress := int(math.Floor(float64(((height-y)*width)+x) / float64(width*height) * 100))
 			if newProgress != progress {
@@ -48,9 +48,9 @@ func main() {
 		}
 	}
 
-	fmt.Println("render took ", time.Since(startTime))
+	fmt.Println("render took ", time.Since(startTime).Round(time.Millisecond))
 
-	f, error := os.Create("render.png")
+	f, error := os.Create(fmt.Sprintf("render%v.png", time.Now().Unix()))
 	if error != nil {
 		fmt.Println(error)
 	}
@@ -61,7 +61,7 @@ func rayColor(r Ray, w World, depth float64) Vector3 {
 	if depth > 50 {
 		return Vector3{0, 0, 0}
 	}
-	hitRecord, hit := w.Hit(r, 0, math.Inf(1))
+	hitRecord, hit := w.Hit(r, 0.0, math.Inf(1))
 	if hit {
 		target := hitRecord.Point.Add(hitRecord.Normal).Add(RandomInUnitSphere())
 		bounceRay := Ray{
@@ -79,4 +79,12 @@ func skyboxColor(r Ray) Vector3 {
 	a := Vector3{0.5, 0.7, 1.0}.Scale(t)
 	b := Vector3{1.0, 1.0, 1.0}.Scale(1.0 - t)
 	return a.Add(b)
+}
+
+func (v Vector3) gammaCorrect() Vector3 {
+	return Vector3{
+		X: math.Sqrt(v.X),
+		Y: math.Sqrt(v.Y),
+		Z: math.Sqrt(v.Z),
+	}
 }
