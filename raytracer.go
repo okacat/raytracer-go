@@ -6,43 +6,32 @@ import (
 	"image/color"
 	"image/png"
 	"os"
+	"time"
 )
 
-const width = 300
-const height = 200
+const width = 1000
+const height = 600
 
 func main() {
 	upLeft := image.Point{0, 0}
 	lowRight := image.Point{width, height}
 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
 
-	aspectRatio := float64(width) / float64(height)
-	viewportHeight := 2.0
-	viewportWidth := viewportHeight * aspectRatio
-	focalLength := 1.0
+	camera := MakeCamera(Vector3{0, 0, 0}, width, height)
 
-	origin := Vector3{0, 0, 0}
-	horizontal := Vector3{viewportWidth, 0, 0}
-	vertical := Vector3{0, viewportHeight, 0}
-	lowerLeftCorner := origin.
-		Subtract(horizontal.Scale(0.5)).
-		Subtract(vertical.Scale(0.5)).
-		Subtract(Vector3{0, 0, focalLength})
-	fmt.Println("lower left", lowerLeftCorner)
+	startTime := time.Now()
 
 	for y := height - 1; y >= 0; y-- {
 		for x := 0; x < width; x++ {
 			u := float64(x) / float64(width-1)
 			v := float64(y) / float64(height-1)
-			rayDirection := lowerLeftCorner.
-				Add(horizontal.Scale(u)).
-				Add(vertical.Scale(v)).
-				Subtract(origin)
-			ray := Ray{origin, rayDirection}
+			ray := camera.GetRay(u, v)
 			clr := rayColor(ray)
 			img.Set(x, y, clr)
 		}
 	}
+
+	fmt.Println("render took ", time.Since(startTime))
 
 	f, error := os.Create("render.png")
 	if error != nil {
