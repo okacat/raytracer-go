@@ -88,12 +88,12 @@ func (a Vector3) ToColor() color.Color {
 }
 
 // RandomInUnitSphere returns a random vector inside a unit sphere
-func RandomInUnitSphere() Vector3 {
+func RandomInUnitSphere(r *rand.Rand) Vector3 {
 	for {
 		vector := Vector3{
-			X: rand.Float64()*2.0 - 1.0,
-			Y: rand.Float64()*2.0 - 1.0,
-			Z: rand.Float64()*2.0 - 1.0,
+			X: r.Float64()*2.0 - 1.0,
+			Y: r.Float64()*2.0 - 1.0,
+			Z: r.Float64()*2.0 - 1.0,
 		}
 		if vector.LengthSquared() < 1 {
 			return vector
@@ -102,6 +102,6 @@ func RandomInUnitSphere() Vector3 {
 }
 
 // RandomOnUnitSphere returns a random vector on the surface of a unit sphere
-func RandomOnUnitSphere() Vector3 {
-	return RandomInUnitSphere().Unit()
+func RandomOnUnitSphere(r *rand.Rand) Vector3 {
+	return RandomInUnitSphere(r).Unit()
 }

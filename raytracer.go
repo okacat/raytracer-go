@@ -63,21 +63,22 @@ func main() {
 }
 
 func rayColorPar(r Ray, w World, c chan Vector3) {
-	c <- rayColor(r, w, 0)
+	rnd := rand.New(rand.NewSource(time.Now().Unix()))
+	c <- rayColor(r, w, 0, rnd)
 }
 
-func rayColor(r Ray, w World, depth float64) Vector3 {
+func rayColor(r Ray, w World, depth float64, rnd *rand.Rand) Vector3 {
 	if depth > 50 {
 		return Vector3{0, 0, 0}
 	}
 	hitRecord, hit := w.Hit(r, 0.0, math.Inf(1))
 	if hit {
-		target := hitRecord.Point.Add(hitRecord.Normal).Add(RandomInUnitSphere())
+		target := hitRecord.Point.Add(hitRecord.Normal).Add(RandomInUnitSphere(rnd))
 		bounceRay := Ray{
 			Origin:    hitRecord.Point,
 			Direction: target.Subtract(hitRecord.Point),
 		}
-		return rayColor(bounceRay, w, depth+1)
+		return rayColor(bounceRay, w, depth+1, rnd)
 	}
 	return skyboxColor(r)
 }
