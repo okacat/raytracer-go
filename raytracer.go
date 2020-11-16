@@ -33,18 +33,18 @@ func main() {
 		for x := 0; x < width; x++ {
 			ch := make(chan Vector3, samplesPerPixel)
 			accumulatedColor := Vector3{0, 0, 0}
-			rnd := rand.New(rand.NewSource(time.Now().Unix()))
+			// rnd := rand.New(rand.NewSource(time.Now().Unix()))
 			for sample := 0; sample < cap(ch); sample++ {
 				u := (float64(x) + rand.Float64()) / float64(width-1)
 				v := (float64(y) + rand.Float64()) / float64(height-1)
 				ray := camera.GetRay(u, v)
-				// go rayColorPar(ray, world, ch)
-				accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0, rnd))
+				go rayColorPar(ray, world, ch)
+				// accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0, rnd))
 			}
-			// for n := 0; n < cap(ch); n++ {
-			// 	sampleColor := <-ch
-			// 	accumulatedColor = accumulatedColor.Add(sampleColor)
-			// }
+			for n := 0; n < cap(ch); n++ {
+				sampleColor := <-ch
+				accumulatedColor = accumulatedColor.Add(sampleColor)
+			}
 			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).gammaCorrect().ToColor()
 			img.Set(x, height-y, pixelColor)
 			newProgress := int(math.Floor(float64(((height-y)*width)+x) / float64(width*height) * 100))
