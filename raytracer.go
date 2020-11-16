@@ -7,6 +7,8 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"runtime"
+	"sync"
 	"time"
 )
 
@@ -16,6 +18,9 @@ const samplesPerPixel = 50
 const maxBounces = 50
 
 func main() {
+	numThreads := 4
+	fmt.Printf("number of available CPUs: %v, spawning %v threads\n", runtime.NumCPU(), numThreads)
+
 	upLeft := image.Point{0, 0}
 	lowRight := image.Point{width, height}
 	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
@@ -28,32 +33,23 @@ func main() {
 
 	startTime := time.Now()
 
-	progress := 0
-	for y := height - 1; y >= 0; y-- {
-		for x := 0; x < width; x++ {
-			ch := make(chan Vector3, samplesPerPixel)
-			accumulatedColor := Vector3{0, 0, 0}
-			// rnd := rand.New(rand.NewSource(time.Now().Unix()))
-			for sample := 0; sample < cap(ch); sample++ {
-				u := (float64(x) + rand.Float64()) / float64(width-1)
-				v := (float64(y) + rand.Float64()) / float64(height-1)
-				ray := camera.GetRay(u, v)
-				go rayColorPar(ray, world, ch)
-				// accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0, rnd))
-			}
-			for n := 0; n < cap(ch); n++ {
-				sampleColor := <-ch
-				accumulatedColor = accumulatedColor.Add(sampleColor)
-			}
-			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).gammaCorrect().ToColor()
-			img.Set(x, height-y, pixelColor)
-			newProgress := int(math.Floor(float64(((height-y)*width)+x) / float64(width*height) * 100))
-			if newProgress != progress {
-				progress = newProgress
-				fmt.Printf("progress [%v%%]\n", progress)
-			}
-		}
+	// progress := 0
+	var wg sync.WaitGroup
+	wg.Add(height)
+
+	jobs := make(chan int)
+
+	for i := 0; i < numThreads; i++ {
+		fmt.Println("making a thread")
+		rnd := rand.New(rand.NewSource(time.Now().Unix()))
+		go lineWorker(world, camera, img, rnd, jobs, &wg)
 	}
+
+	for line := height - 1; line >= 0; line-- {
+		jobs <- line
+	}
+
+	wg.Wait()
 
 	fmt.Println("render took ", time.Since(startTime).Round(time.Millisecond))
 
@@ -62,6 +58,23 @@ func main() {
 		fmt.Println(error)
 	}
 	png.Encode(f, img)
+}
+
+func lineWorker(world World, camera Camera, img *image.RGBA, rnd *rand.Rand, jobs chan int, wg *sync.WaitGroup) {
+	for y := range jobs {
+		for x := 0; x < width; x++ {
+			accumulatedColor := Vector3{0, 0, 0}
+			for sample := 0; sample < samplesPerPixel; sample++ {
+				u := (float64(x) + rand.Float64()) / float64(width-1)
+				v := (float64(y) + rand.Float64()) / float64(height-1)
+				ray := camera.GetRay(u, v)
+				accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0, rnd))
+			}
+			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).gammaCorrect().ToColor()
+			img.Set(x, height-y, pixelColor)
+		}
+		wg.Done()
+	}
 }
 
 func rayColorPar(r Ray, w World, c chan Vector3) {
