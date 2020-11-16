@@ -7,13 +7,14 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"path"
 	"runtime"
 	"sync"
 	"time"
 )
 
-const width = 500
-const height = 250
+const width = 500 / 10
+const height = 250 / 10
 const samplesPerPixel = 50
 const maxBounces = 50
 
@@ -21,9 +22,7 @@ func main() {
 	numThreads := 4
 	fmt.Printf("number of available CPUs: %v, spawning %v threads\n", runtime.NumCPU(), numThreads)
 
-	upLeft := image.Point{0, 0}
-	lowRight := image.Point{width, height}
-	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
+	img := createImage()
 
 	world := World{[]Hittable{
 		Sphere{Vector3{0, 0, -1}, 0.5},
@@ -53,12 +52,7 @@ func main() {
 	wg.Wait()
 
 	fmt.Println("render took ", time.Since(startTime).Round(time.Millisecond))
-
-	f, error := os.Create(fmt.Sprintf("render%v.png", time.Now().Unix()))
-	if error != nil {
-		fmt.Println(error)
-	}
-	png.Encode(f, img)
+	saveImageAs(img, fmt.Sprintf("render%v.png", time.Now().Unix()))
 }
 
 func lineWorker(world World, camera Camera, img *image.RGBA, rnd *rand.Rand, jobs chan int, progressUpdates chan int, wg *sync.WaitGroup) {
@@ -123,4 +117,19 @@ func (v Vector3) gammaCorrect() Vector3 {
 		Y: math.Sqrt(v.Y),
 		Z: math.Sqrt(v.Z),
 	}
+}
+
+func createImage() *image.RGBA {
+	upLeft := image.Point{0, 0}
+	lowRight := image.Point{width, height}
+	return image.NewRGBA(image.Rectangle{upLeft, lowRight})
+}
+
+func saveImageAs(img *image.RGBA, filename string) {
+	os.Mkdir("output", 0775)
+	f, error := os.Create(path.Join("output", filename))
+	if error != nil {
+		fmt.Println(error)
+	}
+	png.Encode(f, img)
 }
