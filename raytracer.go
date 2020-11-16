@@ -33,16 +33,17 @@ func main() {
 
 	startTime := time.Now()
 
-	// progress := 0
 	var wg sync.WaitGroup
 	wg.Add(height)
 
 	jobs := make(chan int)
+	progressUpdates := make(chan int)
+
+	go listenForProgress(progressUpdates)
 
 	for i := 0; i < numThreads; i++ {
-		fmt.Println("making a thread")
 		rnd := rand.New(rand.NewSource(time.Now().Unix()))
-		go lineWorker(world, camera, img, rnd, jobs, &wg)
+		go lineWorker(world, camera, img, rnd, jobs, progressUpdates, &wg)
 	}
 
 	for line := height - 1; line >= 0; line-- {
@@ -60,7 +61,7 @@ func main() {
 	png.Encode(f, img)
 }
 
-func lineWorker(world World, camera Camera, img *image.RGBA, rnd *rand.Rand, jobs chan int, wg *sync.WaitGroup) {
+func lineWorker(world World, camera Camera, img *image.RGBA, rnd *rand.Rand, jobs chan int, progressUpdates chan int, wg *sync.WaitGroup) {
 	for y := range jobs {
 		for x := 0; x < width; x++ {
 			accumulatedColor := Vector3{0, 0, 0}
@@ -73,7 +74,17 @@ func lineWorker(world World, camera Camera, img *image.RGBA, rnd *rand.Rand, job
 			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).gammaCorrect().ToColor()
 			img.Set(x, height-y, pixelColor)
 		}
+		progressUpdates <- 1
 		wg.Done()
+	}
+}
+
+func listenForProgress(progressUpdates chan int) {
+	linesCompleted := 0
+	for p := range progressUpdates {
+		linesCompleted += p
+		percent := math.Floor(100 * float64(linesCompleted) / float64(height))
+		fmt.Printf("rendered %v/%v lines [%v%%]\n", linesCompleted, height, percent)
 	}
 }
 
