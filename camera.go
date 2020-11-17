@@ -6,8 +6,8 @@ type Camera struct {
 	aspectRatio                                     float64
 }
 
-// MakeCamera initializeds and returns a new Camera
-func MakeCamera(position Vector3, width, height float64) Camera {
+// NewCamera initializeds and returns a new Camera
+func NewCamera(position Vector3, width, height float64) Camera {
 	aspectRatio := width / height
 	viewportHeight := 2.0
 	viewportWidth := viewportHeight * aspectRatio

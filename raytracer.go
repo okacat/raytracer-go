@@ -13,9 +13,9 @@ import (
 	"time"
 )
 
-const width = 500 / 10
-const height = 250 / 10
-const samplesPerPixel = 50
+const width = 500 / 2
+const height = 250 / 2
+const samplesPerPixel = 100
 const maxBounces = 50
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 		Sphere{Vector3{0, 0, -1}, 0.5},
 		Sphere{Vector3{0, -100.5, -1}, 100},
 	}}
-	camera := MakeCamera(Vector3{0, 0, 0}, width, height)
+	camera := NewCamera(Vector3{0, 0, 0}, width, height)
 
 	startTime := time.Now()
 
@@ -82,18 +82,15 @@ func listenForProgress(progressUpdates chan int) {
 	}
 }
 
-func rayColorPar(r Ray, w World, c chan Vector3) {
-	rnd := rand.New(rand.NewSource(time.Now().Unix()))
-	c <- rayColor(r, w, 0, rnd)
-}
-
-func rayColor(r Ray, w World, depth float64, rnd *rand.Rand) Vector3 {
+func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
 	if depth > 50 {
 		return Vector3{0, 0, 0}
 	}
-	hitRecord, hit := w.Hit(r, 0.0, math.Inf(1))
+	hitRecord, hit := w.Hit(r, 0, math.Inf(1))
 	if hit {
-		target := hitRecord.Point.Add(hitRecord.Normal).Add(RandomInUnitSphere(rnd))
+		target := hitRecord.Point.
+			Add(hitRecord.Normal).
+			Add(RandomInUnitHemisphere(hitRecord.Normal, rnd))
 		bounceRay := Ray{
 			Origin:    hitRecord.Point,
 			Direction: target.Subtract(hitRecord.Point),
