@@ -5,6 +5,7 @@ import "math"
 // Hittable is an object that can be hit by a Ray
 type Hittable interface {
 	Hit(Ray, float64, float64) (*HitRecord, bool)
+	GetMaterial() Material
 }
 
 // HitRecord holds information of a Ray hitting a Hittable object
@@ -12,10 +13,11 @@ type HitRecord struct {
 	Point, Normal Vector3
 	T             float64
 	IsFrontFace   bool
+	Material      Material
 }
 
 // NewHitRecord initializes a new HitRecord and returns it
-func NewHitRecord(point, normal Vector3, ray Ray, t float64) HitRecord {
+func NewHitRecord(point, normal Vector3, ray Ray, t float64, m Material) HitRecord {
 	rayDotNormal := ray.Direction.Dot(normal)
 	isBackFace := rayDotNormal > 0
 	outwardNormal := normal
@@ -27,6 +29,7 @@ func NewHitRecord(point, normal Vector3, ray Ray, t float64) HitRecord {
 		Normal:      outwardNormal,
 		T:           t,
 		IsFrontFace: !isBackFace,
+		Material:    m,
 	}
 }
 
@@ -34,6 +37,7 @@ func NewHitRecord(point, normal Vector3, ray Ray, t float64) HitRecord {
 type Sphere struct {
 	Position Vector3
 	Radius   float64
+	Material Material
 }
 
 // Hit returns the record of the hit if hit and a boolean denoting if the object was hit
@@ -56,6 +60,11 @@ func (s Sphere) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	}
 	hitPoint := r.At(root)
 	normal := hitPoint.Subtract(Vector3{0, 0, -1}).Unit()
-	hitRecord := NewHitRecord(hitPoint, normal, r, root)
+	hitRecord := NewHitRecord(hitPoint, normal, r, root, s.GetMaterial())
 	return &hitRecord, true
+}
+
+// GetMaterial returns the sphere's material
+func (s Sphere) GetMaterial() Material {
+	return s.Material
 }

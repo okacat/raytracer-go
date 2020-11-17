@@ -47,6 +47,15 @@ func (a Vector3) Scale(s float64) Vector3 {
 	}
 }
 
+// MultiplyComponents multiplies this and the other vector by components and returns a new vector
+func (a Vector3) MultiplyComponents(b Vector3) Vector3 {
+	return Vector3{
+		X: a.X * b.X,
+		Y: a.Y * b.Y,
+		Z: a.Z * b.Z,
+	}
+}
+
 // Length returns the length of this Vector3
 func (a Vector3) Length() float64 {
 	return math.Sqrt(a.LengthSquared())
@@ -60,6 +69,12 @@ func (a Vector3) LengthSquared() float64 {
 // Unit returns a new normalized vector
 func (a Vector3) Unit() Vector3 {
 	return a.Scale(1.0 / a.Length())
+}
+
+// IsNearZero returns true if all of the vector's components are very close to zero
+func (a Vector3) IsNearZero() bool {
+	eps := 1e-8
+	return math.Abs(a.X) < eps && math.Abs(a.Y) < eps && math.Abs(a.Z) < eps
 }
 
 // Dot returns the dot product of this and the other vector

@@ -25,9 +25,8 @@ func main() {
 	img := createImage()
 
 	world := World{[]Hittable{
-		Sphere{Vector3{0, 0, -1}, 0.5},
-		Sphere{Vector3{0, -100.5, -1}, 100},
-	}}
+		Sphere{Vector3{0, 0, -1}, 0.5, Lambertian{Vector3{0.3, 0.3, 0.8}}},
+		Sphere{Vector3{0, -100.5, -1}, 100.0, Lambertian{Vector3{0.7, 0.7, 0.7}}}}}
 	camera := NewCamera(Vector3{0, 0, 0}, width, height)
 
 	startTime := time.Now()
@@ -88,14 +87,8 @@ func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
 	}
 	hitRecord, hit := w.Hit(r, 0, math.Inf(1))
 	if hit {
-		target := hitRecord.Point.
-			Add(hitRecord.Normal).
-			Add(RandomInUnitHemisphere(hitRecord.Normal, rnd))
-		bounceRay := Ray{
-			Origin:    hitRecord.Point,
-			Direction: target.Subtract(hitRecord.Point),
-		}
-		return rayColor(bounceRay, w, depth+1, rnd)
+		bounceRay, attenuation := hitRecord.Material.Scatter(r, *hitRecord, rnd)
+		return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)
 	}
 	return skyboxColor(r)
 }
