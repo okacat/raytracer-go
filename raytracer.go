@@ -86,7 +86,7 @@ func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
 	if depth > 50 {
 		return Vector3{0, 0, 0}
 	}
-	hitRecord, hit := w.Hit(r, 0.0, math.Inf(1))
+	hitRecord, hit := w.Hit(r, 0.001, math.Inf(1))
 	if hit {
 		// return hitRecord.Normal.Add(Vector3{1, 1, 1}).Scale(0.5) // render normals
 		bounceRay, attenuation, hasScattered := hitRecord.Material.Scatter(r, *hitRecord, rnd)
