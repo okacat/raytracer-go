@@ -9,7 +9,7 @@ type Material interface {
 
 // Lambertian is a diffuse material
 type Lambertian struct {
-	Albedo Vector3
+	Color Vector3
 }
 
 // Scatter returns the scattered ray and it's attenuation
@@ -26,7 +26,7 @@ func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, b
 		Origin:    h.Point,
 		Direction: scatterDirection,
 	}
-	return scatteredRay, l.Albedo, true
+	return scatteredRay, l.Color, true
 }
 
 // Metal is a reflective material

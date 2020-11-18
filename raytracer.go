@@ -25,9 +25,24 @@ func main() {
 	img := createImage()
 
 	world := World{[]Hittable{
-		Sphere{Vector3{0, 0, -1}, 0.5, Lambertian{Vector3{0.8, 0.6, 0.6}}},
-		Sphere{Vector3{-1.1, 0, -1}, 0.5, Metal{Vector3{0.3, 0.3, 1.0}}},
-		Sphere{Vector3{0, -100.5, -1}, 100.0, Lambertian{Vector3{0.7, 0.7, 0.0}}}}}
+		Sphere{
+			Position: Vector3{0, 0, -1},
+			Radius:   0.5,
+			Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
+		Sphere{
+			Position: Vector3{-1.1, 0, -1},
+			Radius:   0.5,
+			Material: Metal{Color: Vector3{0.2, 0.2, 0.9}}},
+		Sphere{
+			Position: Vector3{1.1, 0, -1},
+			Radius:   0.5,
+			Material: Metal{Color: Vector3{0.9, 0.2, 0.2}}},
+		Sphere{
+			Position: Vector3{0, -100.5, -1},
+			Radius:   100,
+			Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}},
+	}}
+
 	camera := NewCamera(Vector3{0, 0, 0}, width, height)
 
 	startTime := time.Now()
