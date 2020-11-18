@@ -91,6 +91,11 @@ func (a Vector3) Cross(b Vector3) Vector3 {
 	}
 }
 
+// Reflect reflects this vector over the normal and returns a new vector
+func (a Vector3) Reflect(normal Vector3) Vector3 {
+	return a.Subtract(normal.Scale(a.Dot(normal) * 2.0))
+}
+
 // ToColor converts the vector to a image.Color.RGBA and returns the result
 // The values are expected to be [0..1]
 func (a Vector3) ToColor() color.Color {

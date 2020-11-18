@@ -13,10 +13,10 @@ import (
 	"time"
 )
 
-const width = 500 / 2
-const height = 250 / 2
+const width = 500
+const height = 250
 const samplesPerPixel = 100
-const maxBounces = 50
+const maxBounces = 10
 
 func main() {
 	numThreads := 4
@@ -25,8 +25,9 @@ func main() {
 	img := createImage()
 
 	world := World{[]Hittable{
-		Sphere{Vector3{0, 0, -1}, 0.5, Lambertian{Vector3{0.3, 0.3, 0.8}}},
-		Sphere{Vector3{0, -100.5, -1}, 100.0, Lambertian{Vector3{0.7, 0.7, 0.7}}}}}
+		Sphere{Vector3{0, 0, -1}, 0.5, Lambertian{Vector3{0.8, 0.6, 0.6}}},
+		Sphere{Vector3{-1.1, 0, -1}, 0.5, Metal{Vector3{0.3, 0.3, 1.0}}},
+		Sphere{Vector3{0, -100.5, -1}, 100.0, Lambertian{Vector3{0.7, 0.7, 0.0}}}}}
 	camera := NewCamera(Vector3{0, 0, 0}, width, height)
 
 	startTime := time.Now()
@@ -87,8 +88,11 @@ func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
 	}
 	hitRecord, hit := w.Hit(r, 0, math.Inf(1))
 	if hit {
-		bounceRay, attenuation := hitRecord.Material.Scatter(r, *hitRecord, rnd)
-		return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)
+		bounceRay, attenuation, hasScattered := hitRecord.Material.Scatter(r, *hitRecord, rnd)
+		if hasScattered {
+			return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)
+		}
+		return Vector3{0, 0, 0}
 	}
 	return skyboxColor(r)
 }

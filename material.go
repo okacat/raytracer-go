@@ -4,7 +4,7 @@ import "math/rand"
 
 // Material determines how rays scatter
 type Material interface {
-	Scatter(Ray, HitRecord, *rand.Rand) (Ray, Vector3)
+	Scatter(Ray, HitRecord, *rand.Rand) (Ray, Vector3, bool)
 }
 
 // Lambertian is a diffuse material
@@ -13,7 +13,7 @@ type Lambertian struct {
 }
 
 // Scatter returns the scattered ray and it's attenuation
-func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3) {
+func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, bool) {
 	scatterDirection := h.Normal.Add(RandomInUnitHemisphere(h.Normal, rnd))
 
 	// Catch degenerate scatter direction
@@ -25,5 +25,21 @@ func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3) {
 		Origin:    h.Point,
 		Direction: scatterDirection,
 	}
-	return scatteredRay, l.Albedo
+	return scatteredRay, l.Albedo, true
+}
+
+// Metal is a reflective material
+type Metal struct {
+	Color Vector3
+}
+
+// Scatter returns the scattered ray and it's attenuation
+func (m Metal) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, bool) {
+	reflected := r.Direction.Unit().Reflect(h.Normal)
+	scatteredRay := Ray{
+		Origin:    h.Point,
+		Direction: reflected,
+	}
+	hasScattered := reflected.Dot(h.Normal) > 0
+	return scatteredRay, m.Color, hasScattered
 }
