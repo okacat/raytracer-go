@@ -13,10 +13,10 @@ import (
 	"time"
 )
 
-const width = 500
-const height = 250
-const samplesPerPixel = 100
-const maxBounces = 10
+const width = 600
+const height = 300
+const samplesPerPixel = 150
+const maxBounces = 50
 
 func main() {
 	numThreads := 4
@@ -86,8 +86,9 @@ func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
 	if depth > 50 {
 		return Vector3{0, 0, 0}
 	}
-	hitRecord, hit := w.Hit(r, 0, math.Inf(1))
+	hitRecord, hit := w.Hit(r, 0.0, math.Inf(1))
 	if hit {
+		// return hitRecord.Normal.Add(Vector3{1, 1, 1}).Scale(0.5) // render normals
 		bounceRay, attenuation, hasScattered := hitRecord.Material.Scatter(r, *hitRecord, rnd)
 		if hasScattered {
 			return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)

@@ -15,6 +15,7 @@ type Lambertian struct {
 // Scatter returns the scattered ray and it's attenuation
 func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, bool) {
 	scatterDirection := h.Normal.Add(RandomInUnitHemisphere(h.Normal, rnd))
+	// scatterDirection := h.Normal.Add(RandomInUnitSphere(rnd))
 
 	// Catch degenerate scatter direction
 	if scatterDirection.IsNearZero() {

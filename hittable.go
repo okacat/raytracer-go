@@ -19,16 +19,16 @@ type HitRecord struct {
 // NewHitRecord initializes a new HitRecord and returns it
 func NewHitRecord(point, normal Vector3, ray Ray, t float64, m Material) HitRecord {
 	rayDotNormal := ray.Direction.Dot(normal)
-	isBackFace := rayDotNormal > 0
+	isFrontFace := rayDotNormal < 0
 	outwardNormal := normal
-	if isBackFace {
+	if !isFrontFace {
 		outwardNormal = normal.Scale(-1)
 	}
 	return HitRecord{
 		Point:       point,
 		Normal:      outwardNormal,
 		T:           t,
-		IsFrontFace: !isBackFace,
+		IsFrontFace: isFrontFace,
 		Material:    m,
 	}
 }
@@ -59,7 +59,7 @@ func (s Sphere) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 		}
 	}
 	hitPoint := r.At(root)
-	normal := hitPoint.Subtract(Vector3{0, 0, -1}).Unit()
+	normal := hitPoint.Subtract(s.Position).Scale(1.0 / s.Radius)
 	hitRecord := NewHitRecord(hitPoint, normal, r, root, s.GetMaterial())
 	return &hitRecord, true
 }

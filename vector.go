@@ -129,8 +129,8 @@ func RandomOnUnitSphere(r *rand.Rand) Vector3 {
 // RandomInUnitHemisphere returns a random vector in the unit hemisphere determined by the normal
 func RandomInUnitHemisphere(normal Vector3, r *rand.Rand) Vector3 {
 	if inUnitSphere := RandomInUnitSphere(r); inUnitSphere.Dot(normal) > 0.0 {
-		return inUnitSphere.Scale(-1)
-	} else {
 		return inUnitSphere
+	} else {
+		return inUnitSphere.Scale(-1.0)
 	}
 }
