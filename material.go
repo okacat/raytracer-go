@@ -31,12 +31,16 @@ func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, b
 
 // Metal is a reflective material
 type Metal struct {
-	Color Vector3
+	Color     Vector3
+	Glosiness float64
 }
 
 // Scatter returns the scattered ray and it's attenuation
 func (m Metal) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, bool) {
-	reflected := r.Direction.Unit().Reflect(h.Normal)
+	reflected := r.Direction.
+		Unit().
+		Reflect(h.Normal).
+		Add(RandomInUnitSphere(rnd).Scale(1.0 - m.Glosiness))
 	scatteredRay := Ray{
 		Origin:    h.Point,
 		Direction: reflected,

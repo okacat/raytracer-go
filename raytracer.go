@@ -32,11 +32,11 @@ func main() {
 		Sphere{
 			Position: Vector3{-1.1, 0, -1},
 			Radius:   0.5,
-			Material: Metal{Color: Vector3{0.2, 0.2, 0.9}}},
+			Material: Metal{Color: Vector3{0.2, 0.2, 0.9}, Glosiness: 1.0}},
 		Sphere{
 			Position: Vector3{1.1, 0, -1},
 			Radius:   0.5,
-			Material: Metal{Color: Vector3{0.9, 0.2, 0.2}}},
+			Material: Metal{Color: Vector3{0.9, 0.2, 0.2}, Glosiness: 0.7}},
 		Sphere{
 			Position: Vector3{0, -100.5, -1},
 			Radius:   100,
