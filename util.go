@@ -1,5 +1,7 @@
 package main
 
+import "math"
+
 // Clamp returns x clamped between min and max
 func Clamp(x, min, max float64) float64 {
 	switch {
@@ -10,4 +12,9 @@ func Clamp(x, min, max float64) float64 {
 	default:
 		return x
 	}
+}
+
+// Deg2Rad converts degrees to radians
+func Deg2Rad(deg float64) float64 {
+	return deg * math.Pi / 180.0
 }

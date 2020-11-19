@@ -30,8 +30,8 @@ func main() {
 			Radius:   0.5,
 			Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
 		Sphere{
-			Position: Vector3{-1.0, 0, -1},
-			Radius:   0.4,
+			Position: Vector3{-1.1, 0, -1},
+			Radius:   0.5,
 			Material: Dielectric{IndexOfRefraction: 1.5}},
 		Sphere{
 			Position: Vector3{1.1, 0, -1},
@@ -43,7 +43,10 @@ func main() {
 			Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}},
 	}}
 
-	camera := NewCamera(Vector3{0, 0, 0}, width, height)
+	position := Vector3{-2, 2, 1}
+	lookAt := Vector3{0, 0, -1}
+	up := Vector3{0, 1, 0}
+	camera := NewCamera(position, lookAt, up, width, height, 90.0)
 
 	startTime := time.Now()
 
