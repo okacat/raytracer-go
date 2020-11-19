@@ -15,7 +15,7 @@ import (
 
 const width = 600
 const height = 300
-const samplesPerPixel = 150
+const samplesPerPixel = 100
 const maxBounces = 50
 
 func main() {
@@ -30,9 +30,9 @@ func main() {
 			Radius:   0.5,
 			Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
 		Sphere{
-			Position: Vector3{-1.1, 0, -1},
-			Radius:   0.5,
-			Material: Metal{Color: Vector3{0.2, 0.2, 0.9}, Glosiness: 1.0}},
+			Position: Vector3{-1.0, 0, -1},
+			Radius:   0.4,
+			Material: Dielectric{IndexOfRefraction: 1.5}},
 		Sphere{
 			Position: Vector3{1.1, 0, -1},
 			Radius:   0.5,

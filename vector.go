@@ -96,6 +96,14 @@ func (a Vector3) Reflect(normal Vector3) Vector3 {
 	return a.Subtract(normal.Scale(a.Dot(normal) * 2.0))
 }
 
+// Refract refracts the ray given the normal and the coefficient of refraction indexes
+func (a Vector3) Refract(normal Vector3, coefficient float64) Vector3 {
+	cosTheta := math.Min(a.Scale(-1.0).Dot(normal), 1.0)
+	perpendicular := a.Add(normal.Scale(cosTheta)).Scale(coefficient)
+	parallel := normal.Scale(-math.Sqrt(math.Abs(1.0 - perpendicular.LengthSquared())))
+	return perpendicular.Add(parallel)
+}
+
 // ToColor converts the vector to a image.Color.RGBA and returns the result
 // The values are expected to be [0..1]
 func (a Vector3) ToColor() color.Color {
