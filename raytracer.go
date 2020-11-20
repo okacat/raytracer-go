@@ -26,32 +26,32 @@ func main() {
 
 	world := World{[]Hittable{
 		Triangle{
-			V0:       Vector3{-0.5, 0.5, -1},
-			V1:       Vector3{0.0, 1.0, -1},
-			V2:       Vector3{0.5, 0.5, -1},
-			Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
+			V0:       Vector3{-2.0, -1.0, -2.5},
+			V1:       Vector3{0.0, 2.0, -2.5},
+			V2:       Vector3{2.0, -1.0, -2.5},
+			Material: Metal{Color: Vector3{0.8, 0.8, 0.8}, Glosiness: 0.7}},
 		Sphere{
 			Position: Vector3{0, 0, -1},
 			Radius:   0.5,
 			Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
-		Sphere{
-			Position: Vector3{-1.1, 0, -1},
-			Radius:   0.5,
-			Material: Dielectric{IndexOfRefraction: 1.5}},
-		Sphere{
-			Position: Vector3{1.1, 0, -1},
-			Radius:   0.5,
-			Material: Metal{Color: Vector3{0.9, 0.2, 0.2}, Glosiness: 0.7}},
+		// Sphere{
+		// 	Position: Vector3{-1.1, 0, -1},
+		// 	Radius:   0.5,
+		// 	Material: Dielectric{IndexOfRefraction: 1.5}},
+		// Sphere{
+		// 	Position: Vector3{1.1, 0, -1},
+		// 	Radius:   0.5,
+		// 	Material: Metal{Color: Vector3{0.9, 0.2, 0.2}, Glosiness: 0.7}},
 		Sphere{
 			Position: Vector3{0, -100.5, -1},
 			Radius:   100,
 			Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}},
 	}}
 
-	position := Vector3{0, 0, -2}
-	lookAt := Vector3{0, 0, -1}
+	position := Vector3{1.0, 0, 0.0}
+	lookAt := Vector3{0, 0, -1.0}
 	up := Vector3{0, 1, 0}
-	aperture := 1.0 / 32.0
+	aperture := 1.0 / 16.0
 	focusDistance := position.Subtract(lookAt).Length()
 	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
 
