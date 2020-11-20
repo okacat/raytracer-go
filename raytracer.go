@@ -29,7 +29,7 @@ func main() {
 			V0:       Vector3{-2.0, -1.0, -2.5},
 			V1:       Vector3{0.0, 2.0, -2.5},
 			V2:       Vector3{2.0, -1.0, -2.5},
-			Material: Metal{Color: Vector3{0.8, 0.8, 0.8}, Glosiness: 0.7}},
+			Material: Metal{Color: Vector3{0.8, 0.8, 0.8}, Glosiness: 0.99}},
 		Sphere{
 			Position: Vector3{0, 0, -1},
 			Radius:   0.5,

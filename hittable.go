@@ -94,7 +94,7 @@ func (trig Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	t := f * edge2.Dot(q)
 	if t > epsilon {
 		hitPoint := r.Origin.Add(r.Direction.Scale(t))
-		normal := edge1.Cross(edge2)
+		normal := edge1.Cross(edge2).Unit()
 		hitRecord := NewHitRecord(hitPoint, normal, r, t, trig.Material)
 		return &hitRecord, true
 	}
