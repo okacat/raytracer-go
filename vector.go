@@ -142,3 +142,17 @@ func RandomInUnitHemisphere(normal Vector3, r *rand.Rand) Vector3 {
 		return inUnitSphere.Scale(-1.0)
 	}
 }
+
+// RandomOnUnitDisk returns a random vector on a unit disk
+func RandomOnUnitDisk(r *rand.Rand) Vector3 {
+	for {
+		vector := Vector3{
+			X: r.Float64()*2.0 - 1.0,
+			Y: r.Float64()*2.0 - 1.0,
+			Z: 0,
+		}
+		if vector.LengthSquared() < 1 {
+			return vector
+		}
+	}
+}

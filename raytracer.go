@@ -43,10 +43,12 @@ func main() {
 			Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}},
 	}}
 
-	position := Vector3{-2, 2, 1}
+	position := Vector3{3, 3, 2}
 	lookAt := Vector3{0, 0, -1}
 	up := Vector3{0, 1, 0}
-	camera := NewCamera(position, lookAt, up, width, height, 90.0)
+	aperture := 1.0 / 1.8
+	focusDistance := position.Subtract(lookAt).Length()
+	camera := NewCamera(position, lookAt, up, 20.0, aperture, focusDistance, width, height)
 
 	startTime := time.Now()
 
@@ -80,7 +82,7 @@ func lineWorker(world World, camera Camera, img *image.RGBA, rnd *rand.Rand, job
 			for sample := 0; sample < samplesPerPixel; sample++ {
 				u := (float64(x) + rand.Float64()) / float64(width-1)
 				v := (float64(y) + rand.Float64()) / float64(height-1)
-				ray := camera.GetRay(u, v)
+				ray := camera.GetRay(u, v, rnd)
 				accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0, rnd))
 			}
 			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).gammaCorrect().ToColor()
