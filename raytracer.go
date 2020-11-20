@@ -25,6 +25,11 @@ func main() {
 	img := createImage()
 
 	world := World{[]Hittable{
+		Triangle{
+			V0:       Vector3{-0.5, 0.5, -1},
+			V1:       Vector3{0.0, 1.0, -1},
+			V2:       Vector3{0.5, 0.5, -1},
+			Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
 		Sphere{
 			Position: Vector3{0, 0, -1},
 			Radius:   0.5,
@@ -43,12 +48,12 @@ func main() {
 			Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}},
 	}}
 
-	position := Vector3{3, 3, 2}
+	position := Vector3{0, 0, -2}
 	lookAt := Vector3{0, 0, -1}
 	up := Vector3{0, 1, 0}
-	aperture := 1.0 / 1.8
+	aperture := 1.0 / 32.0
 	focusDistance := position.Subtract(lookAt).Length()
-	camera := NewCamera(position, lookAt, up, 20.0, aperture, focusDistance, width, height)
+	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
 
 	startTime := time.Now()
 

@@ -5,7 +5,6 @@ import "math"
 // Hittable is an object that can be hit by a Ray
 type Hittable interface {
 	Hit(Ray, float64, float64) (*HitRecord, bool)
-	GetMaterial() Material
 }
 
 // HitRecord holds information of a Ray hitting a Hittable object
@@ -60,11 +59,44 @@ func (s Sphere) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	}
 	hitPoint := r.At(root)
 	normal := hitPoint.Subtract(s.Position).Scale(1.0 / s.Radius)
-	hitRecord := NewHitRecord(hitPoint, normal, r, root, s.GetMaterial())
+	hitRecord := NewHitRecord(hitPoint, normal, r, root, s.Material)
 	return &hitRecord, true
 }
 
-// GetMaterial returns the sphere's material
-func (s Sphere) GetMaterial() Material {
-	return s.Material
+// Triangle is a Hittable object
+type Triangle struct {
+	V0, V1, V2 Vector3
+	Material   Material
+}
+
+// Hit returns the record of the hit if hit and a boolean denoting if the object was hit
+func (trig Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
+	// Source: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+	epsilon := 0.0000001
+	edge1 := trig.V1.Subtract(trig.V0)
+	edge2 := trig.V2.Subtract(trig.V0)
+	h := r.Direction.Cross(edge2)
+	a := edge1.Dot(h)
+	if a > -epsilon && a < epsilon {
+		return nil, false // This ray is parallel to this triangle.
+	}
+	f := 1.0 / a
+	s := r.Origin.Subtract(trig.V0)
+	u := f * s.Dot(h)
+	if u < 0.0 || u > 1.0 {
+		return nil, false
+	}
+	q := s.Cross(edge1)
+	v := f * r.Direction.Dot(q)
+	if v < 0.0 || u+v > 1.0 {
+		return nil, false
+	}
+	t := f * edge2.Dot(q)
+	if t > epsilon {
+		hitPoint := r.Origin.Add(r.Direction.Scale(t))
+		normal := edge1.Cross(edge2)
+		hitRecord := NewHitRecord(hitPoint, normal, r, t, trig.Material)
+		return &hitRecord, true
+	}
+	return nil, false
 }
