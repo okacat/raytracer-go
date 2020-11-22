@@ -15,7 +15,7 @@ import (
 
 const width = 600
 const height = 300
-const samplesPerPixel = 100
+const samplesPerPixel = 100 / 4
 const maxBounces = 50
 
 func main() {
@@ -24,36 +24,16 @@ func main() {
 
 	img := createImage()
 
-	world := World{[]Hittable{
-		Triangle{
-			V0:       Vector3{-2.0, -1.0, -2.5},
-			V1:       Vector3{0.0, 2.0, -2.5},
-			V2:       Vector3{2.0, -1.0, -2.5},
-			Material: Metal{Color: Vector3{0.8, 0.8, 0.8}, Glosiness: 0.99}},
-		Sphere{
-			Position: Vector3{0, 0, -1},
-			Radius:   0.5,
-			Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
-		// Sphere{
-		// 	Position: Vector3{-1.1, 0, -1},
-		// 	Radius:   0.5,
-		// 	Material: Dielectric{IndexOfRefraction: 1.5}},
-		// Sphere{
-		// 	Position: Vector3{1.1, 0, -1},
-		// 	Radius:   0.5,
-		// 	Material: Metal{Color: Vector3{0.9, 0.2, 0.2}, Glosiness: 0.7}},
-		Sphere{
-			Position: Vector3{0, -100.5, -1},
-			Radius:   100,
-			Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}},
-	}}
-
-	position := Vector3{1.0, 0, 0.0}
+	position := Vector3{1, 1, 1}
 	lookAt := Vector3{0, 0, -1.0}
 	up := Vector3{0, 1, 0}
-	aperture := 1.0 / 16.0
+	// aperture := 1.0 / 16.0
+	aperture := 0.0
 	focusDistance := position.Subtract(lookAt).Length()
 	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
+
+	// world := NewTestWorld()
+	world := NewTestWorldFromObj()
 
 	startTime := time.Now()
 
@@ -113,12 +93,12 @@ func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
 	}
 	hitRecord, hit := w.Hit(r, 0.001, math.Inf(1))
 	if hit {
-		// return hitRecord.Normal.Add(Vector3{1, 1, 1}).Scale(0.5) // render normals
-		bounceRay, attenuation, hasScattered := hitRecord.Material.Scatter(r, *hitRecord, rnd)
-		if hasScattered {
-			return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)
-		}
-		return Vector3{0, 0, 0}
+		return hitRecord.Normal.Add(Vector3{1, 1, 1}).Scale(0.5) // render normals
+		// bounceRay, attenuation, hasScattered := hitRecord.Material.Scatter(r, *hitRecord, rnd)
+		// if hasScattered {
+		// return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)
+		// }
+		// return Vector3{0, 0, 0}
 	}
 	return skyboxColor(r)
 }
