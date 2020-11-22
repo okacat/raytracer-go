@@ -108,7 +108,7 @@ func (tri Triangle) HitNew(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 }
 
 // Hit returns the record of the hit if hit and a boolean denoting if the object was hit
-func (tri Triangle) HitMT(r Ray, tMin, tMax float64) (*HitRecord, bool) {
+func (tri Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	// Source: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 	epsilon := 0.0000001
 	edge1 := tri.V1.Subtract(tri.V0)
@@ -132,15 +132,14 @@ func (tri Triangle) HitMT(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	t := f * edge2.Dot(q)
 	if t > epsilon {
 		hitPoint := r.At(t)
-		// normal := edge1.Cross(edge2).Unit()
-		normal := Vector3{0, 0, 1}
+		normal := edge1.Cross(edge2).Unit()
 		hitRecord := NewHitRecord(hitPoint, normal, r, t, tri.Material)
 		return &hitRecord, true
 	}
 	return nil, false
 }
 
-func (tri Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
+func (tri Triangle) HitMT(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	epsilon := 0.0000001
 	v0v1 := tri.V1.Subtract(tri.V0)
 	v0v2 := tri.V2.Subtract(tri.V0)

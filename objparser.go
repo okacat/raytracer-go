@@ -76,9 +76,10 @@ func parseFace(line string, verts, normals []Vector3) Triangle {
 	}
 	fmt.Printf("Parsed face %d %d %d\n", v0, v1, v2)
 	return Triangle{
-		V0:       verts[v0-1],
-		V1:       verts[v1-1],
-		V2:       verts[v2-1],
-		Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}},
+		V0: verts[v0-1],
+		V1: verts[v1-1],
+		V2: verts[v2-1],
+		// Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}},
+		Material: Metal{Color: Vector3{0.8, 0.8, 0.8}, Glosiness: 0.99},
 	}
 }

@@ -15,7 +15,7 @@ import (
 
 const width = 600
 const height = 300
-const samplesPerPixel = 100 / 4
+const samplesPerPixel = 100 / 2
 const maxBounces = 50
 
 func main() {
@@ -24,16 +24,9 @@ func main() {
 
 	img := createImage()
 
-	position := Vector3{0, 0, 0}
-	lookAt := Vector3{0, 0, -1.0}
-	up := Vector3{0, 1, 0}
-	// aperture := 1.0 / 16.0
-	aperture := 0.0
-	focusDistance := position.Subtract(lookAt).Length()
-	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
-
 	// world := NewTestWorld()
 	// world := NewTestWorldFromObj()
+	// world := NewTestWorldIcoSphere()
 	world := NewTestWorldTriangles()
 
 	startTime := time.Now()
@@ -48,7 +41,7 @@ func main() {
 
 	for i := 0; i < numThreads; i++ {
 		rnd := rand.New(rand.NewSource(time.Now().Unix()))
-		go lineWorker(world, camera, img, rnd, jobs, progressUpdates, &wg)
+		go lineWorker(world, img, rnd, jobs, progressUpdates, &wg)
 	}
 
 	for line := height - 1; line >= 0; line-- {
@@ -61,14 +54,14 @@ func main() {
 	saveImageAs(img, fmt.Sprintf("render%v.png", time.Now().Unix()))
 }
 
-func lineWorker(world World, camera Camera, img *image.RGBA, rnd *rand.Rand, jobs chan int, progressUpdates chan int, wg *sync.WaitGroup) {
+func lineWorker(world World, img *image.RGBA, rnd *rand.Rand, jobs chan int, progressUpdates chan int, wg *sync.WaitGroup) {
 	for y := range jobs {
 		for x := 0; x < width; x++ {
 			accumulatedColor := Vector3{0, 0, 0}
 			for sample := 0; sample < samplesPerPixel; sample++ {
 				u := (float64(x) + rand.Float64()) / float64(width-1)
 				v := (float64(y) + rand.Float64()) / float64(height-1)
-				ray := camera.GetRay(u, v, rnd)
+				ray := world.Camera.GetRay(u, v, rnd)
 				accumulatedColor = accumulatedColor.Add(rayColor(ray, world, 0, rnd))
 			}
 			pixelColor := accumulatedColor.Scale(1.0 / samplesPerPixel).gammaCorrect().ToColor()
