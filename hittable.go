@@ -70,18 +70,54 @@ type Triangle struct {
 }
 
 // Hit returns the record of the hit if hit and a boolean denoting if the object was hit
-func (trig Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
+// Source: https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
+func (tri Triangle) HitNew(r Ray, tMin, tMax float64) (*HitRecord, bool) {
+	epsilon := 0.0000001
+	v0v1 := tri.V1.Subtract(tri.V0)
+	v0v2 := tri.V2.Subtract(tri.V0)
+	pVec := r.Direction.Cross(v0v2)
+	det := v0v1.Dot(pVec)
+	// #ifdef CULLING
+	//     // if the determinant is negative the triangle is backfacing
+	//     // if the determinant is close to 0, the ray misses the triangle
+	//     if (det < kEpsilon) return false;
+	// #else
+	// ray and triangle are parallel if det is close to 0
+	if math.Abs(det) < epsilon {
+		return nil, false
+	}
+	// #endif
+	invDet := 1.0 / det
+	tVec := r.Origin.Subtract(tri.V0)
+	u := tVec.Dot(pVec) * invDet
+	if u < 0 || u > 1 {
+		return nil, false
+	}
+	qVec := tVec.Cross(v0v1)
+	v := r.Direction.Dot(qVec) * invDet
+	if v < 0 || u+v > 1 {
+		return nil, false
+	}
+	t := v0v2.Dot(qVec) * invDet
+	hitPoint := r.At(t)
+	normal := v0v1.Cross(v0v2).Unit()
+	hitRecord := NewHitRecord(hitPoint, normal, r, t, tri.Material)
+	return &hitRecord, true
+}
+
+// Hit returns the record of the hit if hit and a boolean denoting if the object was hit
+func (tri Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	// Source: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 	epsilon := 0.0000001
-	edge1 := trig.V1.Subtract(trig.V0)
-	edge2 := trig.V2.Subtract(trig.V0)
+	edge1 := tri.V1.Subtract(tri.V0)
+	edge2 := tri.V2.Subtract(tri.V0)
 	h := r.Direction.Cross(edge2)
 	a := edge1.Dot(h)
-	if a > -epsilon && a < epsilon {
+	if a < epsilon { // && a > -epsilon
 		return nil, false // This ray is parallel to this triangle.
 	}
 	f := 1.0 / a
-	s := r.Origin.Subtract(trig.V0)
+	s := r.Origin.Subtract(tri.V0)
 	u := f * s.Dot(h)
 	if u < 0.0 || u > 1.0 {
 		return nil, false
@@ -93,9 +129,9 @@ func (trig Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	}
 	t := f * edge2.Dot(q)
 	if t > epsilon {
-		hitPoint := r.Origin.Add(r.Direction.Scale(t))
+		hitPoint := r.At(t)
 		normal := edge1.Cross(edge2).Unit()
-		hitRecord := NewHitRecord(hitPoint, normal, r, t, trig.Material)
+		hitRecord := NewHitRecord(hitPoint, normal, r, t, tri.Material)
 		return &hitRecord, true
 	}
 	return nil, false

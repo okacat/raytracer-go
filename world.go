@@ -48,6 +48,35 @@ func NewTestWorld() World {
 	}}
 }
 
+// NewTestWorldTriangles returns a new test world
+func NewTestWorldTriangles() World {
+	return World{[]Hittable{
+		Triangle{
+			V0:       Vector3{-2.0, -1.0, -2.5},
+			V1:       Vector3{0.0, -1.0, -2.5},
+			V2:       Vector3{-1.0, 1.0, -2.5},
+			Material: Lambertian{Color: Vector3{0.8, 0.2, 0.2}}},
+		Triangle{
+			V0:       Vector3{-1.5, -1.0, -2.8},
+			V1:       Vector3{0.5, -1.0, -2.8},
+			V2:       Vector3{-0.5, 1.0, -2.8},
+			Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}},
+		Triangle{
+			V0:       Vector3{-1.0, -1.0, -3.0},
+			V1:       Vector3{1.0, -1.0, -3.0},
+			V2:       Vector3{0.0, 1.0, -3.0},
+			Material: Lambertian{Color: Vector3{0.2, 0.2, 0.8}}},
+		Sphere{
+			Position: Vector3{0, 0, -1},
+			Radius:   0.1,
+			Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
+		Sphere{
+			Position: Vector3{0, -100.5, -1},
+			Radius:   100,
+			Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}},
+	}}
+}
+
 // NewTestWorldFromObj returns a new test world reading from obj
 func NewTestWorldFromObj() World {
 	triangles := ReadObj("test_scene.obj")

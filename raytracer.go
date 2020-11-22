@@ -19,13 +19,13 @@ const samplesPerPixel = 100 / 4
 const maxBounces = 50
 
 func main() {
-	numThreads := 4
+	numThreads := 8
 	fmt.Printf("number of available CPUs: %v, spawning %v threads\n", runtime.NumCPU(), numThreads)
 
 	img := createImage()
 
 	position := Vector3{1, 1, 1}
-	lookAt := Vector3{0, 0, -1.0}
+	lookAt := Vector3{1, 0, -1.0}
 	up := Vector3{0, 1, 0}
 	// aperture := 1.0 / 16.0
 	aperture := 0.0
@@ -34,6 +34,7 @@ func main() {
 
 	// world := NewTestWorld()
 	world := NewTestWorldFromObj()
+	// world := NewTestWorldTriangles()
 
 	startTime := time.Now()
 
@@ -93,12 +94,12 @@ func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
 	}
 	hitRecord, hit := w.Hit(r, 0.001, math.Inf(1))
 	if hit {
-		return hitRecord.Normal.Add(Vector3{1, 1, 1}).Scale(0.5) // render normals
-		// bounceRay, attenuation, hasScattered := hitRecord.Material.Scatter(r, *hitRecord, rnd)
-		// if hasScattered {
-		// return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)
-		// }
-		// return Vector3{0, 0, 0}
+		// return hitRecord.Normal.Add(Vector3{1, 1, 1}).Scale(0.5) // render normals
+		bounceRay, attenuation, hasScattered := hitRecord.Material.Scatter(r, *hitRecord, rnd)
+		if hasScattered {
+			return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)
+		}
+		return Vector3{0, 0, 0}
 	}
 	return skyboxColor(r)
 }
