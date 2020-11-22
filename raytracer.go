@@ -24,8 +24,8 @@ func main() {
 
 	img := createImage()
 
-	position := Vector3{1, 1, 1}
-	lookAt := Vector3{1, 0, -1.0}
+	position := Vector3{0, 0, 0}
+	lookAt := Vector3{0, 0, -1.0}
 	up := Vector3{0, 1, 0}
 	// aperture := 1.0 / 16.0
 	aperture := 0.0
@@ -33,8 +33,8 @@ func main() {
 	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
 
 	// world := NewTestWorld()
-	world := NewTestWorldFromObj()
-	// world := NewTestWorldTriangles()
+	// world := NewTestWorldFromObj()
+	world := NewTestWorldTriangles()
 
 	startTime := time.Now()
 

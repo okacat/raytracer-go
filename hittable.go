@@ -1,6 +1,8 @@
 package main
 
-import "math"
+import (
+	"math"
+)
 
 // Hittable is an object that can be hit by a Ray
 type Hittable interface {
@@ -106,14 +108,14 @@ func (tri Triangle) HitNew(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 }
 
 // Hit returns the record of the hit if hit and a boolean denoting if the object was hit
-func (tri Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
+func (tri Triangle) HitMT(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	// Source: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 	epsilon := 0.0000001
 	edge1 := tri.V1.Subtract(tri.V0)
 	edge2 := tri.V2.Subtract(tri.V0)
 	h := r.Direction.Cross(edge2)
 	a := edge1.Dot(h)
-	if a < epsilon { // && a > -epsilon
+	if a < epsilon && a > -epsilon {
 		return nil, false // This ray is parallel to this triangle.
 	}
 	f := 1.0 / a
@@ -130,9 +132,45 @@ func (tri Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	t := f * edge2.Dot(q)
 	if t > epsilon {
 		hitPoint := r.At(t)
-		normal := edge1.Cross(edge2).Unit()
+		// normal := edge1.Cross(edge2).Unit()
+		normal := Vector3{0, 0, 1}
 		hitRecord := NewHitRecord(hitPoint, normal, r, t, tri.Material)
 		return &hitRecord, true
 	}
 	return nil, false
+}
+
+func (tri Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
+	epsilon := 0.0000001
+	v0v1 := tri.V1.Subtract(tri.V0)
+	v0v2 := tri.V2.Subtract(tri.V0)
+	pvec := r.Direction.Cross(v0v2)
+
+	det := v0v1.Dot(pvec)
+
+	// Negative determinant means we're hitting the back face
+	if det < epsilon {
+		return nil, false
+	}
+
+	invDet := 1.0 / det
+	tvec := r.Origin.Subtract(tri.V0)
+	u := tvec.Dot(pvec) * invDet
+
+	if u < 0 || u > 1 {
+		return nil, false
+	}
+
+	qvec := tvec.Cross(v0v1)
+	v := r.Direction.Dot(qvec) * invDet
+
+	if v < 0 || u+v > 1 {
+		return nil, false
+	}
+
+	t := v0v2.Dot(qvec) * invDet
+	hitPoint := r.At(t)
+	normal := v0v1.Cross(v0v2).Unit()
+	hitRecord := NewHitRecord(hitPoint, normal, r, t, tri.Material)
+	return &hitRecord, true
 }

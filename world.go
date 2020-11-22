@@ -12,7 +12,7 @@ func (w *World) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	var hitRecord *HitRecord
 	for _, hittable := range w.Hittables {
 		record, hit := hittable.Hit(r, tMin, closestT)
-		if hit {
+		if hit && closestT > record.T {
 			hitAnything = true
 			closestT = record.T
 			hitRecord = record
