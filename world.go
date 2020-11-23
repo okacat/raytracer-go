@@ -22,8 +22,7 @@ func (w *World) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	return hitRecord, hitAnything
 }
 
-// NewTestWorld returns a new test world
-func NewTestWorld() World {
+func newTestWorldSphereTriangle() World {
 	position := Vector3{1, 0, 0}
 	lookAt := Vector3{0, 0, -1.0}
 	up := Vector3{0, 1, 0}
@@ -49,8 +48,7 @@ func NewTestWorld() World {
 		}}
 }
 
-// NewTestWorldTriangles returns a new test world
-func NewTestWorldTriangles() World {
+func newTestWorldThreeTriangles() World {
 	position := Vector3{0, 0, 0}
 	lookAt := Vector3{0, 0, -1.0}
 	up := Vector3{0, 1, 0}
@@ -86,15 +84,14 @@ func NewTestWorldTriangles() World {
 		}}
 }
 
-// NewTestWorldFromObj returns a new test world reading from obj
-func NewTestWorldFromObj() World {
+func newTestWorldTestSceneObj() World {
 	position := Vector3{0, 0.5, 1}
 	lookAt := Vector3{0, 0, -1.0}
 	up := Vector3{0, 1, 0}
 	aperture := 1.0 / 16.0
 	focusDistance := position.Subtract(lookAt).Length()
 	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
-	triangles := ReadObj("test_scene.obj")
+	triangles := ReadObj("test_scene.obj", Lambertian{Color: Vector3{0.8, 0.8, 0.8}})
 	hittables := make([]Hittable, len(triangles))
 	for i := range triangles {
 		hittables[i] = triangles[i]
@@ -102,14 +99,14 @@ func NewTestWorldFromObj() World {
 	return World{camera, hittables}
 }
 
-func NewTestWorldIcoSphere() World {
+func newTestWorldIcoSphere() World {
 	position := Vector3{0, 0.5, 1}
 	lookAt := Vector3{0, 0, -1.0}
 	up := Vector3{0, 1, 0}
-	aperture := 1.0 / 16.0
+	aperture := 0.0
 	focusDistance := position.Subtract(lookAt).Length()
 	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
-	triangles := ReadObj("icosphere.obj")
+	triangles := ReadObj("icosphere.obj", Metal{Color: Vector3{0.5, 0.5, 0.9}, Glosiness: 0.9})
 	hittables := make([]Hittable, len(triangles))
 	for i := range triangles {
 		hittables[i] = triangles[i]
@@ -118,5 +115,24 @@ func NewTestWorldIcoSphere() World {
 		Position: Vector3{0, -100.5, -1},
 		Radius:   100,
 		Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}})
+	return World{camera, hittables}
+}
+
+func newTestWorldTeapot() World {
+	position := Vector3{0, 0.5, 1}
+	lookAt := Vector3{0, 0, -1.0}
+	up := Vector3{0, 1, 0}
+	aperture := 0.0
+	focusDistance := position.Subtract(lookAt).Length()
+	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
+	triangles := ReadObj("teapot.obj", Metal{Color: Vector3{0.9, 0.3, 0.3}, Glosiness: 0.99})
+	hittables := make([]Hittable, len(triangles))
+	for i := range triangles {
+		hittables[i] = triangles[i]
+	}
+	hittables = append(hittables, Sphere{
+		Position: Vector3{0, -100.5, -1},
+		Radius:   100,
+		Material: Lambertian{Color: Vector3{0.6, 0.6, 0.6}}})
 	return World{camera, hittables}
 }

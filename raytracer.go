@@ -13,10 +13,10 @@ import (
 	"time"
 )
 
-const width = 600
-const height = 300
-const samplesPerPixel = 100 / 2
-const maxBounces = 50
+const width = 600 / 4
+const height = 300 / 4
+const samplesPerPixel = 100 / 4
+const maxBounces = 50 / 4
 
 func main() {
 	numThreads := 8
@@ -24,10 +24,8 @@ func main() {
 
 	img := createImage()
 
-	// world := NewTestWorld()
-	// world := NewTestWorldFromObj()
-	// world := NewTestWorldIcoSphere()
-	world := NewTestWorldTriangles()
+	// world := newTestWorldIcoSphere()
+	world := newTestWorldTeapot()
 
 	startTime := time.Now()
 

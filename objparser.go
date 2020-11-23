@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
 // ReadObj parses a WaveFront .obj file
-func ReadObj(filePath string) []Triangle {
+func ReadObj(filePath string, material Material) []Triangle {
 	file, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
@@ -29,7 +30,7 @@ func ReadObj(filePath string) []Triangle {
 		case strings.HasPrefix(line, "vn "):
 			normals = append(normals, parseNormal(line))
 		case strings.HasPrefix(line, "f "):
-			triangles = append(triangles, parseFace(line, verts, normals))
+			triangles = append(triangles, parseFace(line, verts, normals, material))
 		}
 	}
 
@@ -68,18 +69,26 @@ func parseNormal(line string) Vector3 {
 // format: f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3
 // example: f 5/5/2 6/6/2 7/7/2
 // note: .obj is 1-indexed
-func parseFace(line string, verts, normals []Vector3) Triangle {
-	var v0, v1, v2, t0, t1, t2, n0, n1, n2 int64
-	_, err := fmt.Sscanf(line, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v0, &t0, &n0, &v1, &t1, &n1, &v2, &t2, &n2)
-	if err != nil {
-		log.Fatal(err)
+func parseFace(line string, verts, normals []Vector3, material Material) Triangle {
+	groups := strings.Split(line, " ")
+	if len(groups) > 4 {
+		log.Fatal(".obj models should be triangulated")
 	}
-	fmt.Printf("Parsed face %d %d %d\n", v0, v1, v2)
+
+	vertexIndices := make([]int, 3)
+	for i := 1; i < 4; i++ {
+		splitGroup := strings.Split(groups[i], "/")
+		vertexIndex, err := strconv.Atoi(splitGroup[0])
+		if err != nil {
+			log.Fatal("Couldn't parse vertex index as integer")
+		}
+		vertexIndices[i-1] = vertexIndex
+	}
+
 	return Triangle{
-		V0: verts[v0-1],
-		V1: verts[v1-1],
-		V2: verts[v2-1],
-		// Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}},
-		Material: Metal{Color: Vector3{0.8, 0.8, 0.8}, Glosiness: 0.99},
+		V0:       verts[vertexIndices[0]-1],
+		V1:       verts[vertexIndices[1]-1],
+		V2:       verts[vertexIndices[2]-1],
+		Material: material,
 	}
 }
