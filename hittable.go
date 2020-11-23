@@ -68,43 +68,8 @@ func (s Sphere) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 // Triangle is a Hittable object
 type Triangle struct {
 	V0, V1, V2 Vector3
+	N0, N1, N2 Vector3
 	Material   Material
-}
-
-// Hit returns the record of the hit if hit and a boolean denoting if the object was hit
-// Source: https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/moller-trumbore-ray-triangle-intersection
-func (tri Triangle) HitNew(r Ray, tMin, tMax float64) (*HitRecord, bool) {
-	epsilon := 0.0000001
-	v0v1 := tri.V1.Subtract(tri.V0)
-	v0v2 := tri.V2.Subtract(tri.V0)
-	pVec := r.Direction.Cross(v0v2)
-	det := v0v1.Dot(pVec)
-	// #ifdef CULLING
-	//     // if the determinant is negative the triangle is backfacing
-	//     // if the determinant is close to 0, the ray misses the triangle
-	//     if (det < kEpsilon) return false;
-	// #else
-	// ray and triangle are parallel if det is close to 0
-	if math.Abs(det) < epsilon {
-		return nil, false
-	}
-	// #endif
-	invDet := 1.0 / det
-	tVec := r.Origin.Subtract(tri.V0)
-	u := tVec.Dot(pVec) * invDet
-	if u < 0 || u > 1 {
-		return nil, false
-	}
-	qVec := tVec.Cross(v0v1)
-	v := r.Direction.Dot(qVec) * invDet
-	if v < 0 || u+v > 1 {
-		return nil, false
-	}
-	t := v0v2.Dot(qVec) * invDet
-	hitPoint := r.At(t)
-	normal := v0v1.Cross(v0v2).Unit()
-	hitRecord := NewHitRecord(hitPoint, normal, r, t, tri.Material)
-	return &hitRecord, true
 }
 
 // Hit returns the record of the hit if hit and a boolean denoting if the object was hit
@@ -131,45 +96,14 @@ func (tri Triangle) Hit(r Ray, tMin, tMax float64) (*HitRecord, bool) {
 	}
 	t := f * edge2.Dot(q)
 	if t > epsilon {
+		// normal := edge1.Cross(edge2).Unit()
+		normal := tri.N0.Scale(1.0 - u - v).
+			Add(tri.N1.Scale(u)).
+			Add(tri.N2.Scale(v)).
+			Unit()
 		hitPoint := r.At(t)
-		normal := edge1.Cross(edge2).Unit()
 		hitRecord := NewHitRecord(hitPoint, normal, r, t, tri.Material)
 		return &hitRecord, true
 	}
 	return nil, false
-}
-
-func (tri Triangle) HitMT(r Ray, tMin, tMax float64) (*HitRecord, bool) {
-	epsilon := 0.0000001
-	v0v1 := tri.V1.Subtract(tri.V0)
-	v0v2 := tri.V2.Subtract(tri.V0)
-	pvec := r.Direction.Cross(v0v2)
-
-	det := v0v1.Dot(pvec)
-
-	// Negative determinant means we're hitting the back face
-	if det < epsilon {
-		return nil, false
-	}
-
-	invDet := 1.0 / det
-	tvec := r.Origin.Subtract(tri.V0)
-	u := tvec.Dot(pvec) * invDet
-
-	if u < 0 || u > 1 {
-		return nil, false
-	}
-
-	qvec := tvec.Cross(v0v1)
-	v := r.Direction.Dot(qvec) * invDet
-
-	if v < 0 || u+v > 1 {
-		return nil, false
-	}
-
-	t := v0v2.Dot(qvec) * invDet
-	hitPoint := r.At(t)
-	normal := v0v1.Cross(v0v2).Unit()
-	hitRecord := NewHitRecord(hitPoint, normal, r, t, tri.Material)
-	return &hitRecord, true
 }

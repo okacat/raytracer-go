@@ -76,19 +76,30 @@ func parseFace(line string, verts, normals []Vector3, material Material) Triangl
 	}
 
 	vertexIndices := make([]int, 3)
+	normalIndices := make([]int, 3)
 	for i := 1; i < 4; i++ {
 		splitGroup := strings.Split(groups[i], "/")
-		vertexIndex, err := strconv.Atoi(splitGroup[0])
-		if err != nil {
+
+		vertexIndex, err1 := strconv.Atoi(splitGroup[0])
+		if err1 != nil {
 			log.Fatal("Couldn't parse vertex index as integer")
 		}
 		vertexIndices[i-1] = vertexIndex
+
+		normalIndex, err2 := strconv.Atoi(splitGroup[2])
+		if err2 != nil {
+			log.Fatal("Couldn't parse normal index as integer")
+		}
+		normalIndices[i-1] = normalIndex
 	}
 
 	return Triangle{
 		V0:       verts[vertexIndices[0]-1],
 		V1:       verts[vertexIndices[1]-1],
 		V2:       verts[vertexIndices[2]-1],
+		N0:       normals[normalIndices[0]-1],
+		N1:       normals[normalIndices[1]-1],
+		N2:       normals[normalIndices[2]-1],
 		Material: material,
 	}
 }
