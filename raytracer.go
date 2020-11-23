@@ -15,7 +15,7 @@ import (
 
 const width = 600
 const height = 300
-const samplesPerPixel = 100 / 4
+const samplesPerPixel = 100 * 2
 const maxBounces = 50
 
 func main() {
@@ -24,8 +24,9 @@ func main() {
 
 	img := createImage()
 
-	world := newTestWorldIcoSphere()
+	// world := newTestWorldIcoSphere()
 	// world := newTestWorldTeapot()
+	world := newTestWorldSphereTriangleLight()
 
 	startTime := time.Now()
 
@@ -86,21 +87,16 @@ func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
 	hitRecord, hit := w.Hit(r, 0.001, math.Inf(1))
 	if hit {
 		// return hitRecord.Normal.Add(Vector3{1, 1, 1}).Scale(0.5) // render normals
+		emitted := hitRecord.Material.Emit(r, *hitRecord, rnd)
 		bounceRay, attenuation, hasScattered := hitRecord.Material.Scatter(r, *hitRecord, rnd)
 		if hasScattered {
-			return rayColor(bounceRay, w, depth+1, rnd).MultiplyComponents(attenuation)
+			return rayColor(*bounceRay, w, depth+1, rnd).
+				MultiplyComponents(attenuation).
+				Add(emitted)
 		}
-		return Vector3{0, 0, 0}
+		return emitted
 	}
-	return skyboxColor(r)
-}
-
-func skyboxColor(r Ray) Vector3 {
-	unitDirection := r.Direction.Unit()
-	t := 0.5 * (unitDirection.Y + 1.0)
-	a := Vector3{0.5, 0.7, 1.0}.Scale(t)
-	b := Vector3{1.0, 1.0, 1.0}.Scale(1.0 - t)
-	return a.Add(b)
+	return w.AmbientColor(r)
 }
 
 func (v Vector3) gammaCorrect() Vector3 {

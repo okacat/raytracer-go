@@ -7,7 +7,8 @@ import (
 
 // Material determines how rays scatter
 type Material interface {
-	Scatter(Ray, HitRecord, *rand.Rand) (Ray, Vector3, bool)
+	Scatter(Ray, HitRecord, *rand.Rand) (*Ray, Vector3, bool)
+	Emit(Ray, HitRecord, *rand.Rand) Vector3
 }
 
 // Lambertian is a diffuse material
@@ -16,7 +17,7 @@ type Lambertian struct {
 }
 
 // Scatter returns the scattered ray and it's attenuation
-func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, bool) {
+func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (*Ray, Vector3, bool) {
 	scatterDirection := h.Normal.Add(RandomInUnitHemisphere(h.Normal, rnd))
 	// scatterDirection := h.Normal.Add(RandomInUnitSphere(rnd))
 
@@ -29,7 +30,12 @@ func (l Lambertian) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, b
 		Origin:    h.Point,
 		Direction: scatterDirection,
 	}
-	return scatteredRay, l.Color, true
+	return &scatteredRay, l.Color, true
+}
+
+// Emit returns black, since Lambertian doesn't emit light
+func (l Lambertian) Emit(r Ray, h HitRecord, rnd *rand.Rand) Vector3 {
+	return Vector3{0, 0, 0}
 }
 
 // Metal is a reflective material
@@ -39,7 +45,7 @@ type Metal struct {
 }
 
 // Scatter returns the scattered ray and it's attenuation
-func (m Metal) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, bool) {
+func (m Metal) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (*Ray, Vector3, bool) {
 	reflected := r.Direction.
 		Unit().
 		Reflect(h.Normal).
@@ -49,7 +55,12 @@ func (m Metal) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, bool) 
 		Direction: reflected,
 	}
 	hasScattered := reflected.Dot(h.Normal) > 0
-	return scatteredRay, m.Color, hasScattered
+	return &scatteredRay, m.Color, hasScattered
+}
+
+// Emit returns black, since Metal doesn't emit light
+func (m Metal) Emit(r Ray, h HitRecord, rnd *rand.Rand) Vector3 {
+	return Vector3{0, 0, 0}
 }
 
 // Dielectric is a transparent material than refracts light
@@ -57,8 +68,13 @@ type Dielectric struct {
 	IndexOfRefraction float64
 }
 
+// Emit returns black, since Dielectric doesn't emit light
+func (d Dielectric) Emit(r Ray, h HitRecord, rnd *rand.Rand) Vector3 {
+	return Vector3{0, 0, 0}
+}
+
 // Scatter returns the scattered ray and it's attenuation
-func (d Dielectric) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, bool) {
+func (d Dielectric) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (*Ray, Vector3, bool) {
 	refractionRatio := d.IndexOfRefraction
 	if h.IsFrontFace {
 		refractionRatio = 1.0 / d.IndexOfRefraction
@@ -80,7 +96,22 @@ func (d Dielectric) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (Ray, Vector3, b
 		Origin:    h.Point,
 		Direction: newDirection,
 	}
-	return refractedRay, Vector3{1.0, 1.0, 1.0}, true
+	return &refractedRay, Vector3{1.0, 1.0, 1.0}, true
+}
+
+// Light is an emissive material
+type Light struct {
+	Emission Vector3
+}
+
+// Scatter returns nil and false since Light doesn't bounce or refract rays
+func (l Light) Scatter(r Ray, h HitRecord, rnd *rand.Rand) (*Ray, Vector3, bool) {
+	return nil, Vector3{0, 0, 0}, false
+}
+
+// Emit returns the light's emission, components can be > 1.0
+func (l Light) Emit(r Ray, h HitRecord, rnd *rand.Rand) Vector3 {
+	return l.Emission
 }
 
 func reflectance(cosine, coefficient float64) float64 {

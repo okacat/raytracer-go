@@ -108,9 +108,9 @@ func (a Vector3) Refract(normal Vector3, coefficient float64) Vector3 {
 // The values are expected to be [0..1]
 func (a Vector3) ToColor() color.Color {
 	return color.RGBA{
-		R: uint8(a.X * 255),
-		G: uint8(a.Y * 255),
-		B: uint8(a.Z * 255),
+		R: uint8(Clamp(a.X, 0.0, 1.0) * 255),
+		G: uint8(Clamp(a.Y, 0.0, 1.0) * 255),
+		B: uint8(Clamp(a.Z, 0.0, 1.0) * 255),
 		A: 255,
 	}
 }
