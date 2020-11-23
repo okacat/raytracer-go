@@ -100,14 +100,15 @@ func newTestWorldTestSceneObj() World {
 }
 
 func newTestWorldIcoSphere() World {
-	position := Vector3{0, 0.5, 1}
-	lookAt := Vector3{0, 0, -1.0}
+	position := Vector3{0, 0.8, 1}
+	lookAt := Vector3{0, 0.5, 0}
 	up := Vector3{0, 1, 0}
-	aperture := 0.0
+	aperture := 1.0 / 32.0
 	focusDistance := position.Subtract(lookAt).Length()
 	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
-	// triangles := ReadObj("icosphere_smooth.obj", Metal{Color: Vector3{0.5, 0.5, 0.9}, Glosiness: 0.9})
-	triangles := ReadObj("icosphere_smooth.obj", Lambertian{Color: Vector3{0.4, 0.4, 0.9}})
+	triangles := ReadObj("icosphere_smooth.obj", Metal{Color: Vector3{0.8, 0.8, 1.0}, Glosiness: 0.99})
+	// triangles := ReadObj("icosphere_smooth.obj", Lambertian{Color: Vector3{0.4, 0.4, 0.9}})
+	// triangles := ReadObj("icosphere_smooth.obj", Dielectric{IndexOfRefraction: 1.4})
 	hittables := make([]Hittable, len(triangles))
 	for i := range triangles {
 		hittables[i] = triangles[i]
@@ -115,7 +116,7 @@ func newTestWorldIcoSphere() World {
 	hittables = append(hittables, Sphere{
 		Position: Vector3{0, -100.5, -1},
 		Radius:   100,
-		Material: Lambertian{Color: Vector3{0.2, 0.8, 0.2}}})
+		Material: Lambertian{Color: Vector3{0.8, 0.2, 0.2}}})
 	return World{camera, hittables}
 }
 
