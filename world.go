@@ -38,7 +38,7 @@ func newTestWorldSphereTriangle() World {
 	up := Vector3{0, 1, 0}
 	aperture := 1.0 / 16.0
 	focusDistance := position.Subtract(lookAt).Length()
-	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
+	camera := NewCamera(position, lookAt, up, 75.0, aperture, focusDistance, width, height)
 	return World{
 		Camera: camera,
 		Hittables: []Hittable{
@@ -66,9 +66,9 @@ func newTestWorldSphereTriangle() World {
 
 func newTestWorldSphereTriangleLight() World {
 	position := Vector3{1, 0, 0}
-	lookAt := Vector3{0, 0, -1.0}
+	lookAt := Vector3{0.4, 0.15, -1.0}
 	up := Vector3{0, 1, 0}
-	aperture := 1.0 / 16.0
+	aperture := 1.0 / 8.0
 	focusDistance := position.Subtract(lookAt).Length()
 	camera := NewCamera(position, lookAt, up, 90.0, aperture, focusDistance, width, height)
 	return World{

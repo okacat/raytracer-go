@@ -13,9 +13,9 @@ import (
 	"time"
 )
 
-const width = 600
-const height = 300
-const samplesPerPixel = 100 * 2
+const width = 600 * 3
+const height = 300 * 3
+const samplesPerPixel = 100 * 50
 const maxBounces = 50
 
 func main() {
