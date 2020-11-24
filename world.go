@@ -206,3 +206,48 @@ func newTestWorldTeapot() World {
 		SkyColorBelow: Vector3{1.0, 1.0, 1.0},
 	}
 }
+
+func newTestWorldCornellBox() World {
+	position := Vector3{0, 1, 1.8}
+	lookAt := Vector3{0, 1, -1.0}
+	up := Vector3{0, 1, 0}
+	aperture := 0.0
+	focusDistance := position.Subtract(lookAt).Length()
+	camera := NewCamera(position, lookAt, up, 55.0, aperture, focusDistance, width, height)
+
+	hittables := convertoToHittables(
+		ReadObj("objs/cornell/bottom_and_back_wall.obj", Lambertian{Color: Vector3{0.8, 0.8, 0.8}}),
+		ReadObj("objs/cornell/ceiling.obj", Lambertian{Color: Vector3{0.8, 0.8, 0.8}}),
+		// ReadObj("objs/cornell/ceiling.obj", Light{Emission: Vector3{1.0, 1.0, 1.0}}),
+		ReadObj("objs/cornell/big_light.obj", Light{Emission: Vector3{1.0, 1.0, 1.0}}),
+		ReadObj("objs/cornell/cube.obj", Lambertian{Color: Vector3{0.8, 0.8, 0.8}}),
+		ReadObj("objs/cornell/left_wall.obj", Lambertian{Color: Vector3{0.8, 0.3, 0.3}}),
+		ReadObj("objs/cornell/right_wall.obj", Lambertian{Color: Vector3{0.3, 0.8, 0.3}}),
+	)
+
+	hittables = append(hittables, Sphere{
+		Position: Vector3{-0.44, 0.4, -1.1},
+		Radius:   0.4,
+		// Material: Metal{Color: Vector3{0.9, 0.9, 0.9}, Glosiness: 0.99},
+		Material: Dielectric{IndexOfRefraction: 1.4},
+	})
+
+	return World{
+		Camera:        camera,
+		Hittables:     hittables,
+		SkyColorAbove: Vector3{0, 0, 0},
+		SkyColorBelow: Vector3{0, 0, 0},
+	}
+}
+
+func convertoToHittables(triangleArrays ...[]Triangle) []Hittable {
+	var hittables []Hittable
+	for _, array := range triangleArrays {
+		h := make([]Hittable, len(array))
+		for i := range array {
+			h[i] = array[i]
+		}
+		hittables = append(hittables, h...)
+	}
+	return hittables
+}

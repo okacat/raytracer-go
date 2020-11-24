@@ -13,9 +13,9 @@ import (
 	"time"
 )
 
-const width = 600 * 3
-const height = 300 * 3
-const samplesPerPixel = 100 * 50
+const width = 500
+const height = 500
+const samplesPerPixel = 100 * 10
 const maxBounces = 50
 
 func main() {
@@ -26,7 +26,8 @@ func main() {
 
 	// world := newTestWorldIcoSphere()
 	// world := newTestWorldTeapot()
-	world := newTestWorldSphereTriangleLight()
+	// world := newTestWorldSphereTriangleLight()
+	world := newTestWorldCornellBox()
 
 	startTime := time.Now()
 
