@@ -15,7 +15,7 @@ import (
 
 const width = 100 * 20
 const height = 100 * 20
-const samplesPerPixel = 1000
+const samplesPerPixel = 100
 const maxBounces = 50
 
 func main() {

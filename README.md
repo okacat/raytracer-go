@@ -1,8 +1,10 @@
 # RAYTRACER
-A raytracer written in Go based on https://raytracing.github.io/books/RayTracingInOneWeekend.html
+A raytracer written in Go, based on https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
 ## Showcase
 ![Cornell box](showcase/cornell_box.png)
+![Pyramid](showcase/pyramid.png)
+![Sphere](showcase/sphere.png)
 
 ## Running
 Run `go run *.go` or `go build` and then run the binary `./raytracer`
@@ -13,7 +15,7 @@ Run `go run *.go` or `go build` and then run the binary `./raytracer`
 - diffuse, glossy and refractive materials
 - positionable camera with depth of field
 - lights
-- **very** basic `.obj` parsing, supports triangulated meshes only
+- *very* basic `.obj` parsing, supports triangulated meshes only
 
 ### Future wish list
 - bounding volume hiearchies to improve speed

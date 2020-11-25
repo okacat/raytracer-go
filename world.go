@@ -301,11 +301,16 @@ func newTestWorldPyramid() World {
 	)
 
 	hittables = append(hittables,
-		Sphere{
-			Position: Vector3{400, 400, -200},
-			Radius:   400,
-			Material: Light{Emission: Vector3{2.0, 2.0, 2.0}},
-		},
+		// Sphere{
+		// 	Position: Vector3{400, 400, -200},
+		// 	Radius:   400,
+		// 	Material: Light{Emission: Vector3{2.0, 2.0, 2.0}},
+		// },
+		// Sphere{
+		// 	Position: Vector3{600, 600, -400},
+		// 	Radius:   400,
+		// 	Material: Light{Emission: Vector3{2.0, 2.0, 2.0}},
+		// },
 		Sphere{
 			Position: Vector3{400, 400, 0},
 			Radius:   400,
@@ -315,8 +320,8 @@ func newTestWorldPyramid() World {
 	return World{
 		Camera:        camera,
 		Hittables:     hittables,
-		SkyColorAbove: Vector3{0, 0, 0},
-		SkyColorBelow: Vector3{0, 0, 0},
+		SkyColorAbove: Vector3{0.5, 0.7, 1.0},
+		SkyColorBelow: Vector3{1.0, 1.0, 1.0},
 	}
 }
 
