@@ -228,9 +228,89 @@ func newTestWorldCornellBox() World {
 	hittables = append(hittables, Sphere{
 		Position: Vector3{-0.44, 0.4, -1.1},
 		Radius:   0.4,
-		// Material: Metal{Color: Vector3{0.9, 0.9, 0.9}, Glosiness: 0.99},
-		Material: Dielectric{IndexOfRefraction: 1.4},
+		Material: Metal{Color: Vector3{0.9, 0.9, 0.9}, Glosiness: 0.99},
+		// Material: Dielectric{IndexOfRefraction: 1.4},
 	})
+
+	return World{
+		Camera:        camera,
+		Hittables:     hittables,
+		SkyColorAbove: Vector3{0, 0, 0},
+		SkyColorBelow: Vector3{0, 0, 0},
+	}
+}
+
+func newTestWorldPlanet() World {
+	position := Vector3{0, 0, 0}
+	lookAt := Vector3{0, 0, -1.0}
+	up := Vector3{0, 1, 0}
+	aperture := 0.0
+	focusDistance := position.Subtract(lookAt).Length()
+	camera := NewCamera(position, lookAt, up, 55.0, aperture, focusDistance, width, height)
+	return World{
+		Camera: camera,
+		Hittables: []Hittable{
+			Sphere{
+				Position: Vector3{0, 0, -3},
+				Radius:   0.5,
+				Material: Lambertian{Color: Vector3{0.8, 0.8, 0.8}}},
+			Sphere{
+				Position: Vector3{-50, 50, -15},
+				Radius:   45,
+				Material: Light{Emission: Vector3{2.0, 2.0, 2.0}}},
+		},
+		SkyColorAbove: Vector3{0, 0, 0},
+		SkyColorBelow: Vector3{0, 0, 0},
+	}
+}
+
+func newTestWorldStairs() World {
+	position := Vector3{0, 1, 1.8}
+	lookAt := Vector3{0, 1, -1.0}
+	up := Vector3{0, 1, 0}
+	aperture := 0.0
+	focusDistance := position.Subtract(lookAt).Length()
+	camera := NewCamera(position, lookAt, up, 55.0, aperture, focusDistance, width, height)
+
+	wallColor := Vector3{0.8, 0.8, 0.8}
+	hittables := convertoToHittables(
+		ReadObj("objs/stairs/stairs_lower.obj", Lambertian{Color: wallColor}),
+		ReadObj("objs/stairs/stairs_upper.obj", Lambertian{Color: wallColor}),
+		ReadObj("objs/stairs/walls.obj", Lambertian{Color: wallColor}),
+		ReadObj("objs/stairs/light.obj", Light{Emission: Vector3{2.0, 2.0, 2.0}}),
+	)
+
+	return World{
+		Camera:        camera,
+		Hittables:     hittables,
+		SkyColorAbove: Vector3{0, 0, 0},
+		SkyColorBelow: Vector3{0, 0, 0},
+	}
+}
+
+func newTestWorldPyramid() World {
+	position := Vector3{0, 3, 2.6}
+	lookAt := Vector3{0, 1, -800.0}
+	up := Vector3{0, 1, 0}
+	aperture := 1.0 / 3.0
+	focusDistance := position.Subtract(lookAt).Length()
+	camera := NewCamera(position, lookAt, up, 22.0, aperture, focusDistance, width, height)
+
+	hittables := convertoToHittables(
+		ReadObj("objs/pyramid/pyramid.obj", Lambertian{Color: Vector3{0.8, 0.8, 0.8}}),
+	)
+
+	hittables = append(hittables,
+		Sphere{
+			Position: Vector3{400, 400, -200},
+			Radius:   400,
+			Material: Light{Emission: Vector3{2.0, 2.0, 2.0}},
+		},
+		Sphere{
+			Position: Vector3{400, 400, 0},
+			Radius:   400,
+			Material: Light{Emission: Vector3{2.0, 2.0, 2.0}},
+		})
 
 	return World{
 		Camera:        camera,
