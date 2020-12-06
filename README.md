@@ -5,6 +5,7 @@ A raytracer written in Go, based on https://raytracing.github.io/books/RayTracin
 ![Cornell box](showcase/cornell_box.png)
 ![Pyramid](showcase/pyramid.png)
 ![Sphere](showcase/sphere.png)
+![Stairs](showcase/stairs.png)
 
 ## Running
 Run `go run *.go` or `go build` and then run the binary `./raytracer`

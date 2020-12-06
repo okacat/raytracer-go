@@ -15,7 +15,7 @@ import (
 
 const width = 100 * 20
 const height = 100 * 20
-const samplesPerPixel = 100
+const samplesPerPixel = 1000
 const maxBounces = 50
 
 func main() {
@@ -29,8 +29,8 @@ func main() {
 	// world := newTestWorldSphereTriangleLight()
 	// world := newTestWorldCornellBox()
 	// world := newTestWorldPlanet()
-	// world := newTestWorldStairs()
-	world := newTestWorldPyramid()
+	world := newTestWorldStairs()
+	// world := newTestWorldPyramid()
 
 	startTime := time.Now()
 
