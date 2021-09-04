@@ -85,7 +85,7 @@ func listenForProgress(progressUpdates chan int) {
 }
 
 func rayColor(r Ray, w World, depth int, rnd *rand.Rand) Vector3 {
-	if depth > 50 {
+	if depth > maxBounces {
 		return Vector3{0, 0, 0}
 	}
 	hitRecord, hit := w.Hit(r, 0.001, math.Inf(1))
